@@ -1,0 +1,15 @@
+<div class="shop-shell">
+  <header class="topbar">
+    <div class="brand">Northstar Market</div>
+    <nav class="nav">
+      @for (item of navItems; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active">{{ item.label }}</a>
+      }
+    </nav>
+    <div class="cart-pill">Cart: {{ cart.itemCount() }}</div>
+  </header>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

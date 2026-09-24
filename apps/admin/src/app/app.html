@@ -1,0 +1,20 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">Shop Admin</div>
+
+    <nav class="nav">
+      @for (item of navItems; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active">{{ item.label }}</a>
+      }
+    </nav>
+
+    <div class="profile-card">
+      <strong>{{ session.user()?.name ?? 'Guest' }}</strong>
+      <span>{{ session.user()?.role ?? 'No role' }}</span>
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>
