@@ -19,7 +19,7 @@ import { Component } from '@angular/core';
       .page { display:grid; gap:1rem; }
       h2 { margin:0; }
       .list { list-style:none; display:grid; gap:0.75rem; padding:0; margin:0; }
-      .list li { background:#f8fafc; border:1px solid #e2e8f0; border-radius:0.8rem; padding:0.9rem 1rem; display:flex; justify-content:space-between; align-items:center; }
+      .list li { background:var(--mat-sys-surface-container-low); border:1px solid var(--mat-sys-outline-variant); border-radius:0.8rem; padding:0.9rem 1rem; display:flex; justify-content:space-between; align-items:center; }
     `,
   ],
 })

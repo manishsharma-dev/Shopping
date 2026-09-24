@@ -1,3 +1,5 @@
+Project documentation: [start here](../../docs/README.md). [Backend guide](../../docs/backend/README.md). The scaffold notes below may describe framework defaults rather than implemented application behavior.
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>

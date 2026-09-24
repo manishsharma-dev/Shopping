@@ -1,3 +1,5 @@
+import { ConfigService } from '@nestjs/config';
+import { allowedOrigins } from './modules/auth/auth-security.middleware';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -7,7 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: true,
+    origin: allowedOrigins(app.get(ConfigService)),
     credentials: true,
   });
 

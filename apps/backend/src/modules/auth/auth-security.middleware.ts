@@ -1,0 +1,58 @@
+import {
+  ForbiddenException,
+  HttpException,
+  Injectable,
+  NestMiddleware,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import type { NextFunction, Request, Response } from 'express';
+
+export const allowedOrigins = (config: ConfigService) =>
+  config
+    .get<string>('AUTH_ORIGINS', 'http://localhost:4200,http://localhost:4300')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+@Injectable()
+export class AuthSecurityMiddleware implements NestMiddleware {
+  private readonly attempts = new Map<
+    string,
+    { count: number; until: number }
+  >();
+  constructor(private readonly config: ConfigService) {}
+  use(req: Request, res: Response, next: NextFunction) {
+    res.setHeader('Cache-Control', 'no-store');
+    if (req.method !== 'POST') return next();
+    if (
+      req.headers['x-shopping-client'] !== 'web' ||
+      (req.headers.origin &&
+        !allowedOrigins(this.config).includes(req.headers.origin))
+    ) {
+      throw new ForbiddenException('Untrusted authentication request');
+    }
+    if (req.path.endsWith('/login') || req.path.endsWith('/register')) {
+      const now = Date.now();
+      for (const [key, value] of this.attempts)
+        if (value.until <= now) this.attempts.delete(key);
+      const key = req.ip ?? req.socket.remoteAddress ?? 'unknown';
+      const attempt = this.attempts.get(key) ?? {
+        count: 0,
+        until: now + 15 * 60 * 1000,
+      };
+      if (
+        attempt.count >= 20 ||
+        (!this.attempts.has(key) && this.attempts.size >= 10000)
+      ) {
+        res.setHeader('Retry-After', Math.ceil((attempt.until - now) / 1000));
+        throw new HttpException(
+          'Too many attempts. Please try again later.',
+          429,
+        );
+      }
+      attempt.count++;
+      this.attempts.set(key, attempt);
+    }
+    next();
+  }
+}

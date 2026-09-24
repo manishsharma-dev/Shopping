@@ -1,20 +1,32 @@
-<div class="app-shell">
-  <aside class="sidebar">
-    <div class="brand">Shop Admin</div>
-
-    <nav class="nav">
-      @for (item of navItems; track item.path) {
-        <a [routerLink]="item.path" routerLinkActive="active">{{ item.label }}</a>
-      }
-    </nav>
-
-    <div class="profile-card">
-      <strong>{{ session.user()?.name ?? 'Guest' }}</strong>
-      <span>{{ session.user()?.role ?? 'No role' }}</span>
-    </div>
-  </aside>
-
+<div class="app-shell" [class.authenticated]="isWorkspace()">
+  @if (isWorkspace()) {
+    <aside class="sidebar">
+      <a class="wordmark" routerLink="/dashboard"
+        ><span class="brand-symbol" aria-hidden="true">N</span
+        ><span>Northstar<small>Administration</small></span></a
+      >
+      <nav class="nav" aria-label="Administration">
+        @for (item of navItems; track item.path) {
+          <a [routerLink]="item.path" routerLinkActive="active">{{ item.label }}</a>
+        }
+      </nav>
+      <div class="profile-card">
+        <strong>{{ session.user()?.name }}</strong
+        ><span>{{ session.user()?.role }}</span>
+        <button mat-stroked-button (click)="logout()">Sign out</button>
+        @if (error()) {
+          <p role="alert">{{ error() }}</p>
+        }
+      </div>
+    </aside>
+  }
   <main class="content">
-    <router-outlet />
+    @if (isWorkspace()) {
+      <header class="workspace-header">
+        <div class="workspace-label"><strong>Workspace</strong>Overview</div>
+        <app-theme-toggle />
+      </header>
+    }
+    <div class="page-content"><router-outlet /></div>
   </main>
 </div>

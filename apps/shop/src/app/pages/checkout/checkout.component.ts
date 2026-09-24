@@ -17,8 +17,8 @@ import { Component } from '@angular/core';
     `
       .page { display:grid; gap:1rem; }
       h2 { margin:0; }
-      .info-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:0.8rem; padding:1rem; }
-      .primary { border:none; background:#111827; color:white; padding:0.8rem 1rem; border-radius:0.7rem; width:fit-content; }
+      .info-box { background:var(--mat-sys-surface-container-low); border:1px solid var(--mat-sys-outline-variant); border-radius:0.8rem; padding:1rem; }
+      .primary { border:none; background:var(--mat-sys-primary); color:var(--mat-sys-on-primary); padding:0.8rem 1rem; border-radius:0.7rem; width:fit-content; }
     `,
   ],
 })

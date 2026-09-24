@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd \"e:\\\\Manish\\\\projects\\\\Shopping\\\\apps\\\\backend\"; node -e \"const \\{ Client \\} = require\\('pg'\\); const client = new Client\\(\\{ host: 'localhost', port: 5433, user: 'postgres', password: 'postgres', database: 'shopping_db' \\}\\); client\\.connect\\(\\)\\.then\\(\\(\\) => \\{ console\\.log\\('DB_OK'\\); return client\\.query\\('SELECT 1 AS ok'\\); \\}\\)\\.then\\(\\(\\{ rows \\}\\) => \\{ console\\.log\\(rows\\[0\\]\\.ok\\); return client\\.end\\(\\); \\}\\)\\.catch\\(err => \\{ console\\.error\\(err\\); process\\.exit\\(1\\); \\}\\);\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -20,8 +20,8 @@ import { CartStore } from '../../core/stores/cart.store';
     `
       .page { display:grid; gap:1rem; }
       h2 { margin:0; }
-      .summary { background:#f8fafc; border:1px solid #e2e8f0; border-radius:0.8rem; padding:1rem; display:flex; justify-content:space-between; }
-      .primary { align-self:flex-start; border:none; background:#7c3aed; color:white; padding:0.75rem 1rem; border-radius:0.7rem; }
+      .summary { background:var(--mat-sys-surface-container-low); border:1px solid var(--mat-sys-outline-variant); border-radius:0.8rem; padding:1rem; display:flex; justify-content:space-between; }
+      .primary { align-self:flex-start; border:none; background:var(--mat-sys-primary); color:var(--mat-sys-on-primary); padding:0.75rem 1rem; border-radius:0.7rem; }
     `,
   ],
 })

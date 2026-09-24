@@ -1,0 +1,33 @@
+import { spawn, spawnSync } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const app = process.argv[2];
+if (!['backend', 'admin', 'shop'].includes(app) || !process.env.npm_execpath) {
+  console.error('Use npm run backend:dev, admin:dev, or shop:dev.');
+  process.exit(1);
+}
+const args = ['--prefix', 'apps/' + app, 'run', app === 'backend' ? 'start:dev' : 'start'];
+if (app !== 'backend') args.push('--', '--host', '0.0.0.0', '--port', app === 'admin' ? '4200' : '4300');
+const watcher = spawn(process.execPath, ['scripts/docs.mjs', 'watch'], { cwd: root, stdio: 'inherit', detached: process.platform !== 'win32', windowsHide: true });
+const server = spawn(process.execPath, [process.env.npm_execpath, ...args], { cwd: root, stdio: 'inherit', detached: process.platform !== 'win32', windowsHide: true });
+let stopping = false;
+function stop(code) {
+  if (stopping) return;
+  stopping = true;
+  for (const child of [watcher, server]) {
+    if (!child.pid || child.exitCode !== null) continue;
+    if (process.platform === 'win32') {
+      spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { stdio: 'ignore', windowsHide: true });
+    } else {
+      try { process.kill(-child.pid, 'SIGTERM'); } catch (error) { if (error.code !== 'ESRCH') throw error; }
+    }
+  }
+  process.exitCode = code;
+}
+server.on('exit', code => stop(code ?? 0));
+watcher.on('exit', code => { if (!stopping) stop(code || 1); });
+for (const child of [server, watcher]) child.on('error', error => { console.error(error.message); stop(1); });
+process.on('SIGINT', () => stop(130));
+process.on('SIGTERM', () => stop(143));

@@ -1,0 +1,15 @@
+{
+  "backend-auth": "cbed6ede355ba9ec7f92757bd8e8e33ec1fb8f1e3de48ba6a31be1d8855f087b",
+  "backend-users": "16a204732cc87cca87e86b0470649e2b661b72c9b13a48831ad5c3b3421a8933",
+  "backend-catalog": "dbc8062f9f2ad7f1c9519e0c1fab88eca166892b316646d24852fb8cb7531b63",
+  "backend-vendors": "e992dba8ab210bed61ab604c323015c77b5110fe479bf35d5d8bdf27936d504b",
+  "backend-health": "0cd200362dec898d1da73dd456cecf1318e16016f31e86c208acaaaab8a4b11d",
+  "backend-runtime": "8748e20874c5f1c102f8e86969dd74ab7299616dc138f4938e1819c5940e5d0f",
+  "admin-auth": "21742e65ac7659ec6d86ddb524648e580eb660f419dad82ece8ef174c275fe20",
+  "admin-app": "c2e1c8a86dbbceca9afb4eae67445ce67977d43551441b1f7017b4ad9077cf5c",
+  "shop-auth": "8d590c16c975cc712d8bc30bfd61e877a79da1edacc1fea9cf38ab7c573b9fda",
+  "shop-app": "58d423eebd9ea88a9d0ed28065b99883685c0723842ae226f7f435ef31a9f17c",
+  "demographics": "881c8c2017e8fe7bdffad1ba865f2737ad45a39abce46b642cbee6988cdb8a92",
+  "tooling": "b5c0964a6d4c040427ec99b6c81eeb6ffeabd0827182dfd85b258faf3035c51a",
+  "frontend-theme": "866cbdfd635b8a3ae46495ea826339fdc3bac96f5496eb5625434649a1322659"
+}

@@ -1,6 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { AdminGuard, AuthGuard } from '../auth/auth.guard';
 
 @Controller('vendors')
+@UseGuards(AuthGuard, AdminGuard)
 export class VendorsController {
   @Get()
   listVendors() {

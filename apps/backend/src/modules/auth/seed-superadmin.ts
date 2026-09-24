@@ -1,0 +1,36 @@
+import { isEmail } from 'class-validator';
+import { Repository } from 'typeorm';
+import { User } from './auth.entities';
+import { hashPassword, publicUser } from './auth.service';
+
+export async function seedSuperadmin(
+  users: Repository<User>,
+  config: { email: string; password: string; nodeEnv?: string },
+) {
+  if (config.nodeEnv === 'production')
+    throw new Error(
+      'The development superadmin seed is disabled in production.',
+    );
+  const email = config.email.trim().toLowerCase();
+  if (!isEmail(email) || email.length > 254)
+    throw new Error('Set a valid SEED_SUPERADMIN_EMAIL.');
+  if (config.password.length < 12 || config.password.length > 128)
+    throw new Error('SEED_SUPERADMIN_PASSWORD must contain 12-128 characters.');
+  const existing = await users.findOneBy({ email });
+  if (existing) {
+    if (existing.role !== 'superadmin')
+      throw new Error(
+        'An account already uses this email. The seed will not change its role or password.',
+      );
+    return { status: 'exists' as const, user: publicUser(existing) };
+  }
+  const user = await users.save(
+    users.create({
+      name: 'Super Admin',
+      email,
+      role: 'superadmin',
+      passwordHash: await hashPassword(config.password),
+    }),
+  );
+  return { status: 'created' as const, user: publicUser(user) };
+}

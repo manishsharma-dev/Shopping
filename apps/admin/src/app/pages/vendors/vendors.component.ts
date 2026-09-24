@@ -18,8 +18,8 @@ import { Component } from '@angular/core';
       .page { display:grid; gap:1rem; }
       h2 { margin:0; }
       .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
-      article { background:#f8fafc; border:1px solid #e2e8f0; border-radius:0.8rem; padding:1rem; display:grid; gap:0.35rem; }
-      article span { color:#475569; }
+      article { background:var(--mat-sys-surface-container-low); border:1px solid var(--mat-sys-outline-variant); border-radius:0.8rem; padding:1rem; display:grid; gap:0.35rem; }
+      article span { color:var(--mat-sys-on-surface-variant); }
       strong { font-size:1.1rem; }
     `,
   ],

@@ -25,14 +25,14 @@ import { Component } from '@angular/core';
     `
       .page { display: grid; gap: 1.5rem; }
       header { display:flex; justify-content:space-between; align-items:center; }
-      .eyebrow { text-transform: uppercase; color:#7c3aed; letter-spacing:0.12em; font-size:0.7rem; margin:0 0 0.3rem; }
+      .eyebrow { text-transform: uppercase; color:var(--mat-sys-primary); letter-spacing:0.12em; font-size:0.7rem; margin:0 0 0.3rem; }
       h2 { margin:0; font-size:2rem; }
-      .primary { background:#7c3aed; color:white; border:none; border-radius:0.75rem; padding:0.75rem 1rem; font-weight:600; }
+      .primary { background:var(--mat-sys-primary); color:var(--mat-sys-on-primary); border:none; border-radius:0.75rem; padding:0.75rem 1rem; font-weight:600; }
       .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; }
-      .stat-card { background:#f8fafc; border:1px solid #e2e8f0; border-radius:1rem; padding:1rem; display:grid; gap:0.4rem; }
-      .stat-card span { color:#64748b; font-size:0.8rem; }
+      .stat-card { background:var(--mat-sys-surface-container-low); border:1px solid var(--mat-sys-outline-variant); border-radius:1rem; padding:1rem; display:grid; gap:0.4rem; }
+      .stat-card span { color:var(--mat-sys-on-surface-variant); font-size:0.8rem; }
       .stat-card strong { font-size:2rem; }
-      .stat-card small { color:#475569; }
+      .stat-card small { color:var(--mat-sys-on-surface-variant); }
     `,
   ],
 })

@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "frontend-theme",
+      "prefixes": [
+        "apps/admin/src/app/core/theme/",
+        "apps/shop/src/app/core/theme/"
+      ],
+      "docs": [
+        "docs/frontend/theming.md",
+        "docs/frontend/design.md"
+      ]
+    },
+    {
+      "id": "backend-auth",
+      "prefixes": [
+        "apps/backend/src/modules/auth/"
+      ],
+      "files": [
+        "apps/backend/test/auth.e2e-spec.ts",
+        "apps/backend/src/scripts/seed-superadmin.ts"
+      ],
+      "docs": [
+        "docs/backend/features/authentication.md",
+        "docs/backend/database.md",
+        "docs/backend/api.md",
+        "docs/design-decisions.md",
+        "docs/backend/features/superadmin-setup.md"
+      ]
+    },
+    {
+      "id": "backend-users",
+      "prefixes": [
+        "apps/backend/src/modules/users/"
+      ],
+      "docs": [
+        "docs/backend/features/users.md",
+        "docs/backend/api.md"
+      ]
+    },
+    {
+      "id": "backend-catalog",
+      "prefixes": [
+        "apps/backend/src/modules/catalog/"
+      ],
+      "docs": [
+        "docs/backend/features/catalog.md",
+        "docs/backend/api.md"
+      ]
+    },
+    {
+      "id": "backend-vendors",
+      "prefixes": [
+        "apps/backend/src/modules/vendors/"
+      ],
+      "docs": [
+        "docs/backend/features/vendors.md",
+        "docs/backend/api.md"
+      ]
+    },
+    {
+      "id": "backend-health",
+      "prefixes": [
+        "apps/backend/src/modules/health/"
+      ],
+      "docs": [
+        "docs/backend/features/health.md",
+        "docs/backend/api.md"
+      ]
+    },
+    {
+      "id": "backend-runtime",
+      "prefixes": [
+        "apps/backend/"
+      ],
+      "docs": [
+        "docs/backend/runtime.md",
+        "docs/getting-started.md",
+        "docs/testing.md",
+        "docs/feature-status.md"
+      ]
+    },
+    {
+      "id": "admin-auth",
+      "prefixes": [
+        "apps/admin/src/app/core/auth/",
+        "apps/admin/src/app/pages/login/"
+      ],
+      "docs": [
+        "docs/frontend/authentication.md",
+        "docs/frontend/admin.md",
+        "docs/design-decisions.md"
+      ]
+    },
+    {
+      "id": "admin-app",
+      "prefixes": [
+        "apps/admin/"
+      ],
+      "docs": [
+        "docs/frontend/admin.md",
+        "docs/frontend/design.md",
+        "docs/feature-status.md",
+        "docs/testing.md"
+      ]
+    },
+    {
+      "id": "shop-auth",
+      "prefixes": [
+        "apps/shop/src/app/core/auth/",
+        "apps/shop/src/app/pages/account/"
+      ],
+      "docs": [
+        "docs/frontend/authentication.md",
+        "docs/frontend/shop.md",
+        "docs/design-decisions.md"
+      ]
+    },
+    {
+      "id": "shop-app",
+      "prefixes": [
+        "apps/shop/"
+      ],
+      "docs": [
+        "docs/frontend/shop.md",
+        "docs/frontend/design.md",
+        "docs/feature-status.md",
+        "docs/testing.md"
+      ]
+    },
+    {
+      "id": "demographics",
+      "files": [
+        "district-import.sql"
+      ],
+      "docs": [
+        "docs/backend/features/demographics.md",
+        "docs/backend/database.md"
+      ]
+    },
+    {
+      "id": "tooling",
+      "prefixes": [
+        "scripts/",
+        ".github/workflows/"
+      ],
+      "files": [
+        "AGENTS.md",
+        "package.json",
+        "docker-compose.yml",
+        ".gitignore"
+      ],
+      "docs": [
+        "docs/maintenance.md",
+        "docs/architecture.md",
+        "docs/getting-started.md"
+      ]
+    }
+  ]
+}

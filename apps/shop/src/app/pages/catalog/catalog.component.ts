@@ -30,8 +30,8 @@ import { Component } from '@angular/core';
       .page { display:grid; gap:1rem; }
       h2 { margin:0; }
       .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
-      article { background:#f8fafc; border:1px solid #e2e8f0; border-radius:1rem; padding:1rem; display:grid; gap:0.6rem; }
-      button { border:none; background:#111827; color:white; padding:0.7rem 1rem; border-radius:0.7rem; }
+      article { background:var(--mat-sys-surface-container-low); border:1px solid var(--mat-sys-outline-variant); border-radius:1rem; padding:1rem; display:grid; gap:0.6rem; }
+      button { border:none; background:var(--mat-sys-primary); color:var(--mat-sys-on-primary); padding:0.7rem 1rem; border-radius:0.7rem; }
     `,
   ],
 })

@@ -1,3 +1,5 @@
+Project documentation: [start here](../../docs/README.md). [Frontend guide](../../docs/frontend/README.md). The scaffold notes below may describe framework defaults rather than implemented application behavior.
+
 # AdminShell
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.0.

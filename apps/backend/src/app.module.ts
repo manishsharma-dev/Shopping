@@ -5,6 +5,7 @@ import { HealthModule } from './modules/health/health.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { UsersModule } from './modules/users/users.module';
 import { VendorsModule } from './modules/vendors/vendors.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -22,10 +23,11 @@ import { VendorsModule } from './modules/vendors/vendors.module';
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_NAME', 'shopping_db'),
         autoLoadEntities: true,
-        synchronize: config.get<boolean>('DB_SYNCHRONIZE', true),
-        logging: config.get<boolean>('DB_LOGGING', false),
+        synchronize: config.get<string>('DB_SYNCHRONIZE', 'false') === 'true',
+        logging: config.get<string>('DB_LOGGING', 'false') === 'true',
       }),
     }),
+    AuthModule,
     HealthModule,
     CatalogModule,
     UsersModule,

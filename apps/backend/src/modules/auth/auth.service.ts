@@ -1,0 +1,113 @@
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
+import { MoreThan, Repository } from 'typeorm';
+import { AuthSession, User } from './auth.entities';
+import { LoginDto, RegisterDto } from './auth.dto';
+
+const derive = (password: string, salt: string) =>
+  new Promise<Buffer>((resolve, reject) =>
+    scrypt(
+      password,
+      salt,
+      64,
+      { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 },
+      (error, key) => (error ? reject(error) : resolve(key)),
+    ),
+  );
+export async function hashPassword(password: string) {
+  const salt = randomBytes(16).toString('hex');
+  return `${salt}:${(await derive(password, salt)).toString('hex')}`;
+}
+
+export const sessionHash = (token: string) =>
+  createHash('sha256').update(token).digest('hex');
+export const publicUser = (user: User) => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+});
+export const SESSION_MS = 8 * 60 * 60 * 1000;
+
+@Injectable()
+export class AuthService {
+  constructor(
+    @InjectRepository(User) private readonly users: Repository<User>,
+    @InjectRepository(AuthSession)
+    private readonly sessions: Repository<AuthSession>,
+  ) {}
+
+  async register(dto: RegisterDto) {
+    const passwordHash = await hashPassword(dto.password);
+    try {
+      const user = await this.users.save(
+        this.users.create({
+          name: dto.name,
+          email: dto.email,
+          passwordHash,
+          role: 'customer',
+        }),
+      );
+      return await this.createSession(user);
+    } catch (error) {
+      if ((error as { code?: string }).code === '23505')
+        throw new ConflictException(
+          'An account with this email already exists',
+        );
+      throw error;
+    }
+  }
+
+  async login(dto: LoginDto) {
+    const user = await this.users
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('user.email = :email', { email: dto.email })
+      .getOne();
+    // Perform the same expensive hash operation for unknown accounts.
+    const [salt, hash] = user?.passwordHash.split(':') ?? [
+      '0'.repeat(32),
+      '0'.repeat(128),
+    ];
+    const actual = await derive(dto.password, salt);
+    const expected = Buffer.from(hash, 'hex');
+    if (
+      !user ||
+      actual.length !== expected.length ||
+      !timingSafeEqual(actual, expected)
+    )
+      throw new UnauthorizedException('Invalid email or password');
+    return this.createSession(user);
+  }
+
+  private async createSession(user: User) {
+    const token = randomBytes(32).toString('hex');
+    await this.sessions.save({
+      tokenHash: sessionHash(token),
+      userId: user.id,
+      expiresAt: new Date(Date.now() + SESSION_MS),
+    });
+    return { token, user: publicUser(user) };
+  }
+
+  async authenticate(token: string) {
+    if (!/^[a-f0-9]{64}$/.test(token)) throw new UnauthorizedException();
+    const session = await this.sessions.findOneBy({
+      tokenHash: sessionHash(token),
+      expiresAt: MoreThan(new Date()),
+    });
+    const user =
+      session && (await this.users.findOneBy({ id: session.userId }));
+    if (!user) throw new UnauthorizedException();
+    return publicUser(user);
+  }
+
+  async logout(token: string) {
+    await this.sessions.delete({ tokenHash: sessionHash(token) });
+  }
+}

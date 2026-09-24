@@ -5,11 +5,17 @@
   "scripts": {
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down -v",
-    "backend:dev": "npm --prefix apps/backend run start:dev",
-    "admin:dev": "npm --prefix apps/admin run start -- --host 0.0.0.0 --port 4200",
-    "shop:dev": "npm --prefix apps/shop run start -- --host 0.0.0.0 --port 4300",
+    "backend:dev": "node scripts/dev.mjs backend",
+    "admin:dev": "node scripts/dev.mjs admin",
+    "shop:dev": "node scripts/dev.mjs shop",
     "backend:build": "npm --prefix apps/backend run build",
     "admin:build": "npm --prefix apps/admin run build",
-    "shop:build": "npm --prefix apps/shop run build"
+    "shop:build": "npm --prefix apps/shop run build",
+    "docs:generate": "node scripts/docs.mjs generate",
+    "docs:watch": "node scripts/docs.mjs watch",
+    "docs:check": "node scripts/docs.mjs check",
+    "docs:status": "node scripts/docs.mjs status",
+    "docs:review": "node scripts/docs.mjs review",
+    "docs:test": "node --test scripts/docs.test.mjs"
   }
 }
