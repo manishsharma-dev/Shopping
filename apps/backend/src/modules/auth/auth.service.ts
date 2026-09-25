@@ -1,4 +1,4 @@
-import {
+﻿import {
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -31,6 +31,15 @@ export const publicUser = (user: User) => ({
   name: user.name,
   email: user.email,
   role: user.role,
+  userType:
+    !user.userType || (user.userType === 'Customer' && user.role !== 'customer')
+      ? user.role.replaceAll('_', ' ')
+      : user.userType,
+  userTypeId: user.userTypeId,
+  state: user.state,
+  district: user.district,
+  vendorId: user.vendorId,
+  active: user.active,
 });
 export const SESSION_MS = 8 * 60 * 60 * 1000;
 
@@ -78,6 +87,7 @@ export class AuthService {
     const expected = Buffer.from(hash, 'hex');
     if (
       !user ||
+      user.active === false ||
       actual.length !== expected.length ||
       !timingSafeEqual(actual, expected)
     )
@@ -103,7 +113,7 @@ export class AuthService {
     });
     const user =
       session && (await this.users.findOneBy({ id: session.userId }));
-    if (!user) throw new UnauthorizedException();
+    if (!user || user.active === false) throw new UnauthorizedException();
     return publicUser(user);
   }
 

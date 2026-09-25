@@ -18,6 +18,7 @@ Generated from current repository files. Feature guides explain behavior; these 
 - [apps/shop/src/app/core/theme/theme.service.ts](files/src/app/core/theme/theme.service.ts.md)
 - [apps/shop/src/app/pages/account/account.component.html](files/src/app/pages/account/account.component.html.md)
 - [apps/shop/src/app/pages/account/account.component.ts](files/src/app/pages/account/account.component.ts.md)
+- [apps/shop/src/app/pages/account/vendor-application.component.ts](files/src/app/pages/account/vendor-application.component.ts.md)
 - [apps/shop/src/app/pages/cart/cart.component.ts](files/src/app/pages/cart/cart.component.ts.md)
 - [apps/shop/src/app/pages/catalog/catalog.component.ts](files/src/app/pages/catalog/catalog.component.ts.md)
 - [apps/shop/src/app/pages/checkout/checkout.component.ts](files/src/app/pages/checkout/checkout.component.ts.md)

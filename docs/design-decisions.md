@@ -16,7 +16,7 @@ These explanations record the rationale visible in the implementation and the in
 | Customer-only registration | Avoid user-selected privilege escalation | First local admin is provisioned by an explicit environment-configured seed |
 | AuthGuard then AdminGuard | Separate identity validation from permission checks | Every new protected endpoint must apply the right guard chain |
 | Per-process request limiter | Small first implementation without another service | Not shared across replicas; restart resets limits; proxy IP handling needed |
-| Static commerce controllers/pages | Establish shell and example shapes early | Most commerce behavior is not functional and data can disagree |
+| Scoped management records | Persist vendor/product/access workflows with shared ownership columns and validated JSON payloads | Service-enforced references; requires pagination and normalized high-volume tables when scaling |
 | Transactional district staging | Validate state mappings and all rows before commit | Requires pre-existing table/state setup and does not reconcile geography |
 | Generated references + reviewed guides | Keep exact source details current and preserve human explanation | Authors still review rationale when code changes |
 
@@ -27,3 +27,7 @@ A mobile or third-party API client may need a different credential transport. Mu
 Do not silently change these contracts while adding a page. Update the feature guide, tests, database plan, and both frontend clients where applicable.
 
 Material components and color-scheme tokens now provide consistent light/dark forms. An explicit local-only superadmin seed makes development login usable without a privileged public registration path. See [theming](frontend/theming.md) and [seed setup](backend/features/superadmin-setup.md).
+
+## Scoped marketplace management
+
+Fixed administrative levels set delegation authority; named User Types grant vendor capabilities within immutable assigned scope. Exact-region checks and vendor IDs are enforced on server reads and writes. Custom product fields are typed immutable definitions, preserving historical interpretation. Money uses integer INR minor units and orders capture discounted unit prices. Advisory-locked transactions couple stock, lifecycle changes and audit writes; version checks reject stale edits. This limits write throughput deliberately. Product deletion archives history; collections do not yet implement purchasable kits. See [management rationale and limitations](backend/features/management.md).

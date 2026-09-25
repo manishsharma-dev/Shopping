@@ -1,38 +1,67 @@
-import { Component } from '@angular/core';
-
+﻿import { Component, signal } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 @Component({
   selector: 'app-catalog-page',
   standalone: true,
-  template: `
-    <section class="page">
-      <h2>Browse the catalog</h2>
-      <div class="cards">
+  imports: [CurrencyPipe],
+  template: `<section>
+    <h2>Browse the catalog</h2>
+    @if (loading()) {
+      <p role="status">Loading products...</p>
+    }
+    @if (error()) {
+      <p role="alert">{{ error() }}</p>
+      <button (click)="load()">Retry</button>
+    }
+    <div class="cards">
+      @for (p of products(); track p.id) {
         <article>
-          <span>Premium Hoodie</span>
-          <strong>$89</strong>
-          <button>Add to cart</button>
+          <h3>{{ p.name }}</h3>
+          <p>{{ p.description }}</p>
+          <strong>{{ p.price | currency: 'INR' }}</strong>
+          <p>{{ p.stock > 0 ? 'In stock' : 'Out of stock' }}</p>
         </article>
-        <article>
-          <span>Running Sneakers</span>
-          <strong>$129</strong>
-          <button>Add to cart</button>
-        </article>
-        <article>
-          <span>Travel Backpack</span>
-          <strong>$149</strong>
-          <button>Add to cart</button>
-        </article>
-      </div>
-    </section>
-  `,
+      } @empty {
+        @if (!loading() && !error()) {
+          <p>No products available yet.</p>
+        }
+      }
+    </div>
+  </section>`,
   styles: [
     `
-      .page { display:grid; gap:1rem; }
-      h2 { margin:0; }
-      .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
-      article { background:var(--mat-sys-surface-container-low); border:1px solid var(--mat-sys-outline-variant); border-radius:1rem; padding:1rem; display:grid; gap:0.6rem; }
-      button { border:none; background:var(--mat-sys-primary); color:var(--mat-sys-on-primary); padding:0.7rem 1rem; border-radius:0.7rem; }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+      }
+      article {
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid var(--mat-sys-outline-variant);
+        background: var(--mat-sys-surface-container-low);
+      }
     `,
   ],
 })
-export class CatalogPage {}
+export class CatalogPage {
+  readonly products = signal<any[]>([]);
+  readonly loading = signal(true);
+  readonly error = signal('');
+  constructor() {
+    void this.load();
+  }
+  async load() {
+    this.loading.set(true);
+    this.error.set('');
+    try {
+      const r = await fetch('http://localhost:3000/api/catalog');
+      if (!r.ok) throw new Error('Cannot load products. Please try again.');
+      this.products.set((await r.json()).items);
+    } catch (e) {
+      this.error.set((e as Error).message);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+}

@@ -25,9 +25,9 @@ ThemeToggle labels the action (Switch to light theme or Switch to dark theme), u
 
 ## Layout and forms
 
-The admin root adds its two-column grid only when displaying an authenticated workspace, excluding /login. The login therefore has the full viewport width and no hidden-sidebar column. The root router-outlet remains mounted when shell styling changes.
+The admin root uses a Material sidenav container, with a fixed-height workspace only when authenticated outside /login. Desktop side mode shifts content as the drawer slides; mobile over mode overlays full-width content. Login has no open drawer or reserved sidebar space. The root router-outlet remains mounted when shell styling changes.
 
-At widths below 760px, the decorative auth panel is hidden and the form becomes one column. Admin navigation wraps on small screens; storefront navigation moves below the header below 1000px. No fixed form width exceeds the mobile container.
+At widths below 760px, the decorative auth panel is hidden and the form becomes one column. Admin navigation stays vertical inside a drawer that overlays content at 960px and below; storefront navigation moves below the header below 1000px. No fixed form width exceeds the mobile container.
 
 Forms use MatFormField, MatInput, and Material buttons. Validation errors are attached to fields; server errors use role=alert. Password visibility is toggled with a type=button suffix action. Busy states prevent duplicate submits; account loading uses a Material spinner. Login redirects successful admin/superadmin users to /dashboard.
 
@@ -40,3 +40,5 @@ Theme settings are presentation-only and local; authentication/authorization rem
 ## Verification
 
 Admin component tests exercise the signed-out layout class, Material fields, a successful superadmin redirect and dashboard shell, protected navigation, theme toggling, and saved preference restoration. Shop tests exercise Material login/registration switching, password minimums, theme retention, and signed-in identity. These DOM tests do not replace visual inspection on real desktop/mobile browsers.
+
+Admin app.scss owns the shell, sidebar, sticky header and responsive content padding. Global styles.scss keeps theme/base rules and disables drawer/content/backdrop transitions for prefers-reduced-motion. Sidebar controls use inline SVG icons with accessible labels and expanded state. See [responsive sidebar behavior](admin.md).

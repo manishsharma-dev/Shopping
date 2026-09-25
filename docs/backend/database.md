@@ -1,6 +1,6 @@
 # Database structure
 
-The following describes the four tables observed in local `shopping_db.public` on 2026-09-24 and the current entity definitions. Generated [entity mappings](generated/entities.md) refresh from TypeScript automatically. Live schema drift must be checked separately; the generator does not connect to PostgreSQL.
+The following describes the four tables observed in local `shopping_db.public` on 2026-09-24 before the management feature was added. New mappings and the additive schema upgrade are described below. Generated [entity mappings](generated/entities.md) refresh from TypeScript automatically. Live schema drift must be checked separately; the generator does not connect to PostgreSQL.
 
 ```mermaid
 erDiagram
@@ -23,7 +23,7 @@ Owned by `auth.entities.ts`'s User; read by both auth and users modules.
 | role | varchar | No | customer | Server-managed authorization role |
 | createdAt | timestamp without time zone | No | now() | TypeORM creation timestamp |
 
-Role's TypeScript union contains customer, superadmin, admin, vendor, and vendor_admin. PostgreSQL stores varchar, not an enum/check constraint; direct SQL can write other strings. Email uniqueness is case-sensitive at the database layer; API normalization is what makes normal registration case-insensitive. Direct writes must preserve that invariant. select:false affects ORM queries, not database permissions. Auth login explicitly selects the password hash.
+Role's TypeScript union contains customer, superadmin, admin, state_admin, district_admin, vendor, vendor_admin, and staff. PostgreSQL stores varchar, not an enum/check constraint; direct SQL can write other strings. Email uniqueness is case-sensitive at the database layer; API normalization is what makes normal registration case-insensitive. Direct writes must preserve that invariant. select:false affects ORM queries, not database permissions. Auth login explicitly selects the password hash.
 
 ## auth_sessions
 
@@ -71,4 +71,12 @@ LEFT JOIN public.states s ON s.id = d.state_id WHERE s.id IS NULL;
 
 Do not select password hashes or raw cookies for ordinary debugging. A viewer showing 100 rows may be paginating; COUNT(*) checks the actual count.
 
-Development synchronization updates mapped tables when the backend starts. There are no committed production migrations. For future schema changes, document the migration, defaults, backfill, indexes, rollback implications, and frontend contract impact before deploying.
+Development synchronization updates mapped tables when the backend starts. The management feature includes a manually applied additive SQL upgrade under apps/backend/src/database; there is no automated production migration runner. For future schema changes, document the migration, defaults, backfill, indexes, rollback implications, and frontend contract impact before deploying.
+
+## Management additions
+
+Users now also maps userType varchar(100) NOT NULL DEFAULT Customer; userTypeId UUID NULL; state/district varchar NULL; vendorId UUID NULL; active boolean NOT NULL DEFAULT true. userType labels all accounts; userTypeId identifies a custom staff permission record. Regional and vendor scope is checked by the service on every management request. Blocking an account invalidates authentication even for existing session rows.
+
+The new management_records table holds vendor/type/category/field/product/order/audit rows. Its ownership columns, JSON payload schema, indexes, validation, logical relationships and transaction rules are detailed in [management tables](features/management.md). No new table has been assumed to exist from the older four-table observation. Integration tests create this table only in random test schemas.
+
+`apps/backend/src/database/management-upgrade.sql` adds columns/table/indexes and backfills non-customer type labels transactionally. Review and apply before a synchronization-disabled deployment; development can synchronize on startup. Keep additive fields/table during an application rollback to preserve business data. The upgrade does not import geography or assign legacy vendor accounts to a business automatically.

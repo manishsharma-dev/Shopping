@@ -2,27 +2,14 @@
 
 | Feature | Backend | Admin frontend | Shop frontend |
 | --- | --- | --- | --- |
-| Material appearance | Not applicable | Responsive login and workspace theme toggle | Material account forms and header theme toggle |
-| Local superadmin seed | Explicit development command; no password reset/promotion | Seeded superadmin can sign in and reach dashboard | Not applicable |
-| Email/password auth | Registration, login, logout, session lookup, validation, throttling | Login, restore, role-aware navigation, logout | Register, login, restore, logout |
-| Users | Real DB list, latest 100, admin-only | Static role counts; no API call | Public account identity only |
-| Vendors | Admin-only static example response | Static cards | No vendor workflow |
-| Catalog/products | Public static example response | Static product cards | Static catalog; buttons have no handlers |
-| Dashboard | No metrics/report endpoint | Fixed sample statistics; export inactive | Not applicable |
-| Cart | No tables or endpoints | Not applicable | In-memory store scaffold; provider wiring is incomplete |
-| Checkout/orders | No order/payment/address implementation | No order management | Static address; place-order button inactive |
-| Settings | No configuration API/table | Static list | Not applicable |
-| Geography | Existing states/districts tables and SQL importer | No UI | No address selector/API |
-| Health | Process liveness response | No status page | No status page |
+| Authentication/theme | Cookie sessions, active account enforcement, local superadmin seed | Material login and light/dark theme | Registration/login and theme |
+| Users and User Types | Built-in administrative levels, named staff permissions, scope and blocking | Live list; create subordinate users/types; block/activate | Public identity shows User Type |
+| Vendors | Persistent scoped vendors; applications, approval/rejection and blocking | Live regional approval queue and creation | Signed-in customers submit/view applications |
+| Products/categories | Persistent products, categories, typed custom fields, discounts, grouping, moderation | Live comprehensive form and moderation | Live public catalog |
+| Dashboard | Scoped counts, low stock, flagged/pending queues, fulfilled manual sales, audit | Regional/vendor filters and activity table | Not applicable |
+| Orders | Transactional manual orders, stock reservation/recovery, lifecycle permissions | One-line capture and lifecycle actions | No checkout/order submission |
+| Settings | Shared/vendor categories and field definitions | Editors for categories and fields | Not applicable |
+| Cart/checkout/payments | No customer order/payment API | No refunds, payments or returns | Existing cart provider scaffold and placeholder checkout remain |
+| Geography | Existing imported tables; management currently uses exact text region assignments | Text state/district inputs | Text vendor application region inputs |
 
-## Existing issues documented during inspection
-
-- CartPage injects CartStore, but the store is not registered as a provider. App creates a separate instance with `new CartStore()`. Navigation to the cart can fail dependency injection; the header's demonstration cart is not a shared cart service.
-- The old admin SessionStore is unused by live authentication. Its login method only changes local state.
-- The old backend app end-to-end test expects a root Hello World endpoint, but AppController is not registered in AppModule.
-- Cached frontend session state has no periodic expiry check or cross-tab synchronization. Backend expiry remains authoritative.
-- Registration saves the user and then the session without a shared transaction; a session-write failure can leave a created account.
-- No email verification, password recovery/change, MFA, session management screen, or all-device logout exists.
-- Database migration files and a complete fresh-database demographics bootstrap are not yet provided.
-
-These are observed implementation limits, not changes made by the documentation work. Future fixes should update both this status page and the relevant feature guide.
+See [management](backend/features/management.md) for exact permission, data and API boundaries and [workspace](frontend/management.md) for UI behavior. Product collections are merchandising groups, not purchasable inventory kits. No image upload, scheduled promotions, report export, pagination, notifications, MFA/password reset or tax/shipping configuration is implemented. Old unreferenced admin components still contain examples but are no longer routed.

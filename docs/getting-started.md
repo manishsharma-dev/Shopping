@@ -70,10 +70,16 @@ Both apps now have a Material light/dark toggle that remembers the choice indepe
 
 ## Database ownership and shutdown
 
-Startup with synchronization enabled manages only the mapped `users` and `auth_sessions` tables. States and districts were provisioned separately; the checked-in district importer assumes both tables and all matching states already exist. A new database does not obtain demographic tables automatically. Read [demographics](backend/features/demographics.md) before using that importer.
+Startup with synchronization enabled manages the mapped `users`, `auth_sessions`, and `management_records` tables. States and districts were provisioned separately; the checked-in district importer assumes both tables and all matching states already exist. A new database does not obtain demographic tables automatically. Read [demographics](backend/features/demographics.md) before using that importer.
 
 Use `docker compose stop` to pause the database or `docker compose down` to remove containers while keeping its volume. The existing root `docker:down` script includes `-v` and deletes the database volume; it is a reset command, not a routine shutdown. Do not reset a database to troubleshoot a connection error.
 
 Build with `npm run backend:build`, `npm run admin:build`, and `npm run shop:build`. Documentation references regenerate before builds. The backend TypeScript dependency must be installed for the documentation generator.
 
 The root backend:dev, admin:dev, and shop:dev commands automatically start a documentation watcher alongside the application. Stop the terminal command with Ctrl+C when finished. Direct per-app start commands do not start that watcher.
+
+## Set up the management workspace
+
+For a synchronization-disabled database, review and apply apps/backend/src/database/management-upgrade.sql before starting this version. Development may synchronize on backend restart. This is an additive upgrade; do not reset the database.
+
+Sign in as superadmin, create shared categories and User Types, create a vendor (or approve an application), then create its vendor_admin account. Assign state/district administrators via Users with exact official region names. A vendor administrator can create custom fields, products and staff using shared or vendor-local types. Customers apply from the shop account page. Manual order capture and metrics are available in admin; customer checkout/payment remain unimplemented. See [management](backend/features/management.md).

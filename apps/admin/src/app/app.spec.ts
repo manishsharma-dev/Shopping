@@ -5,8 +5,13 @@ import { App } from './app';
 import { routes } from './app.routes';
 import { AuthService, SessionUser } from './core/auth/auth.service';
 import { ThemeService } from './core/theme/theme.service';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { BehaviorSubject } from 'rxjs';
+import { MatSidenav } from '@angular/material/sidenav';
+import { By } from '@angular/platform-browser';
 
 describe('Admin sign-in and theme', () => {
+  let viewport: BehaviorSubject<{ matches: boolean; breakpoints: Record<string, boolean> }>;
   let auth: {
     user: ReturnType<typeof signal<SessionUser | null>>;
     restore: ReturnType<typeof vi.fn>;
@@ -14,6 +19,28 @@ describe('Admin sign-in and theme', () => {
     logout: ReturnType<typeof vi.fn>;
   };
   beforeEach(async () => {
+    viewport = new BehaviorSubject<{ matches: boolean; breakpoints: Record<string, boolean> }>({
+      matches: false,
+      breakpoints: {},
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          permissions: [],
+          users: [],
+          vendors: [],
+          types: [],
+          categories: [],
+          fields: [],
+          products: [],
+          orders: [],
+          audit: [],
+          stats: null,
+        }),
+      }),
+    );
     localStorage.clear();
     document.documentElement.removeAttribute('data-theme');
     auth = {
@@ -33,8 +60,85 @@ describe('Admin sign-in and theme', () => {
     };
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter(routes), { provide: AuthService, useValue: auth }],
+      providers: [
+        provideRouter(routes),
+        { provide: AuthService, useValue: auth },
+        { provide: BreakpointObserver, useValue: { observe: () => viewport.asObservable() } },
+      ],
     }).compileComponents();
+  });
+  afterEach(() => vi.unstubAllGlobals());
+  async function openWorkspace() {
+    auth.user.set({
+      id: 'admin',
+      name: 'Super Admin',
+      email: 'admin@example.com',
+      role: 'superadmin',
+    });
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    await TestBed.inject(Router).navigateByUrl('/dashboard');
+    await fixture.whenStable();
+    fixture.detectChanges();
+    return fixture;
+  }
+  it('slides the desktop panel out and back in without overlay mode', async () => {
+    const fixture = await openWorkspace();
+    const drawer = fixture.debugElement.query(By.directive(MatSidenav))
+      .componentInstance as MatSidenav;
+    expect(drawer.mode).toBe('side');
+    expect(drawer.opened).toBe(true);
+    const toggle = fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement;
+    toggle.click();
+    await fixture.whenStable();
+    expect(drawer.opened).toBe(false);
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    toggle.click();
+    await fixture.whenStable();
+    expect(drawer.opened).toBe(true);
+  });
+  it('overlays the mobile content and closes on backdrop, Escape and navigation', async () => {
+    viewport.next({ matches: true, breakpoints: {} });
+    const fixture = await openWorkspace();
+    const drawer = fixture.debugElement.query(By.directive(MatSidenav))
+      .componentInstance as MatSidenav;
+    const toggle = fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement;
+    expect(drawer.mode).toBe('over');
+    expect(drawer.opened).toBe(false);
+    toggle.click();
+    await fixture.whenStable();
+    expect(drawer.opened).toBe(true);
+    (fixture.nativeElement.querySelector('.mat-drawer-backdrop') as HTMLElement).click();
+    await fixture.whenStable();
+    expect(drawer.opened).toBe(false);
+    toggle.click();
+    await fixture.whenStable();
+    fixture.nativeElement
+      .querySelector('#admin-sidebar')
+      .dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true }));
+    await fixture.whenStable();
+    expect(drawer.opened).toBe(false);
+    toggle.click();
+    await fixture.whenStable();
+    (fixture.nativeElement.querySelector('.nav a[href="/users"]') as HTMLElement).click();
+    await fixture.whenStable();
+    expect(drawer.opened).toBe(false);
+    expect(TestBed.inject(Router).url).toBe('/users');
+  });
+  it('preserves the desktop collapsed preference across responsive mode changes', async () => {
+    const fixture = await openWorkspace();
+    const drawer = fixture.debugElement.query(By.directive(MatSidenav))
+      .componentInstance as MatSidenav;
+    (fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement).click();
+    await fixture.whenStable();
+    viewport.next({ matches: true, breakpoints: {} });
+    await fixture.whenStable();
+    expect(drawer.mode).toBe('over');
+    expect(drawer.opened).toBe(false);
+    viewport.next({ matches: false, breakpoints: {} });
+    await fixture.whenStable();
+    expect(drawer.mode).toBe('side');
+    expect(drawer.opened).toBe(false);
   });
   async function openLogin() {
     const fixture = TestBed.createComponent(App);

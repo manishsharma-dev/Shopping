@@ -4,7 +4,21 @@ export type SessionUser = {
   id: string;
   name: string;
   email: string;
-  role: 'customer' | 'superadmin' | 'admin' | 'vendor' | 'vendor_admin';
+  role:
+    | 'customer'
+    | 'superadmin'
+    | 'admin'
+    | 'vendor'
+    | 'vendor_admin'
+    | 'state_admin'
+    | 'district_admin'
+    | 'staff';
+  userType?: string;
+  userTypeId?: string;
+  state?: string;
+  district?: string;
+  vendorId?: string;
+  active?: boolean;
 };
 
 @Injectable({ providedIn: 'root' })

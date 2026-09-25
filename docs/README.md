@@ -1,6 +1,6 @@
 # Shopping application documentation
 
-Start here if you are joining the project. This repository contains three applications: a NestJS API, an Angular administration app, and an Angular customer storefront. PostgreSQL stores authentication and geographic reference data.
+Start here if you are joining the project. This repository contains three applications: a NestJS API, an Angular administration app, and an Angular customer storefront. PostgreSQL stores authentication, marketplace management records and geographic reference data.
 
 ## Reading order
 
@@ -19,6 +19,6 @@ Feature guides explain behavior, intent, examples, and limitations. File referen
 
 Generated references describe code on disk, not a running deployment. Database tables in [the database guide](backend/database.md) were checked against the local database on 2026-09-24. Counts are observations, not requirements. Never copy real passwords, cookies, or private `.env` values into documentation.
 
-The application is an early implementation. Authentication works; the product, vendor, checkout, and dashboard experiences are mostly demonstrations. See the feature status before interpreting a screen as a completed feature.
+Authentication and scoped vendor/product/admin workflows are implemented. Customer checkout and payments remain placeholders. See [management](backend/features/management.md) and the feature status for precise boundaries.
 
 [Operations and documentation-tooling file references](generated/README.md) cover Compose, root scripts, the importer, CI, and repository instructions.

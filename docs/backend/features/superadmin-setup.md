@@ -25,7 +25,7 @@ Open http://localhost:4200/login and sign in using those values. Successful supe
 | auth/auth.service.ts / hashPassword | Generate 16-byte salt and the same scrypt hash used by customer registration |
 | auth/seed-superadmin.spec.ts | Creation/hash, idempotency, no customer promotion, production/config rejection tests |
 
-A new account has name Super Admin and role superadmin. Existing superadmins are returned with status exists, without resetting the password. An existing non-superadmin using that email causes an error; the seed never silently promotes accounts. No new table, DTO, controller, or HTTP endpoint is introduced.
+A new account has name Super Admin, role superadmin and User Type Super administrator. Existing superadmins are returned with status exists, without resetting the password. An existing non-superadmin using that email causes an error; the seed never silently promotes accounts. No new table, DTO, controller, or HTTP endpoint is introduced.
 
 If the command says exists, the configured password is not necessarily the existing account's password. Do not assume rerunning the seed changes credentials. Use an intentional credential-management process or a different unused local seed email.
 

@@ -1,16 +1,12 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { AdminGuard, AuthGuard } from '../auth/auth.guard';
-
+﻿import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../auth/auth.guard';
+import type { AuthRequest } from '../auth/auth.guard';
+import { ManagementService } from '../management/management.service';
 @Controller('vendors')
-@UseGuards(AuthGuard, AdminGuard)
+@UseGuards(AuthGuard)
 export class VendorsController {
-  @Get()
-  listVendors() {
-    return {
-      data: [
-        { id: 'ven_1', name: 'Northwind Labs', status: 'active' },
-        { id: 'ven_2', name: 'Blue River Goods', status: 'pending' },
-      ],
-    };
+  constructor(private readonly management: ManagementService) {}
+  @Get() async listVendors(@Req() req: AuthRequest) {
+    return { data: (await this.management.snapshot(req.user, {})).vendors };
   }
 }

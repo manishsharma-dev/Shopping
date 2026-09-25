@@ -2,6 +2,31 @@
   "version": 1,
   "groups": [
     {
+      "id": "backend-management",
+      "prefixes": [
+        "apps/backend/src/modules/management/",
+        "apps/backend/src/database/"
+      ],
+      "files": [
+        "apps/backend/test/management.e2e-spec.ts"
+      ],
+      "docs": [
+        "docs/backend/features/management.md",
+        "docs/backend/database.md",
+        "docs/backend/api.md"
+      ]
+    },
+    {
+      "id": "admin-management",
+      "prefixes": [
+        "apps/admin/src/app/pages/management/"
+      ],
+      "docs": [
+        "docs/frontend/management.md",
+        "docs/frontend/admin.md"
+      ]
+    },
+    {
       "id": "frontend-theme",
       "prefixes": [
         "apps/admin/src/app/core/theme/",

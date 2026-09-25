@@ -1,4 +1,4 @@
-import { isEmail } from 'class-validator';
+﻿import { isEmail } from 'class-validator';
 import { Repository } from 'typeorm';
 import { User } from './auth.entities';
 import { hashPassword, publicUser } from './auth.service';
@@ -29,6 +29,7 @@ export async function seedSuperadmin(
       name: 'Super Admin',
       email,
       role: 'superadmin',
+      userType: 'Super administrator',
       passwordHash: await hashPassword(config.password),
     }),
   );

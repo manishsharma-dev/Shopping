@@ -4,14 +4,14 @@
 
 ```mermaid
 flowchart LR
-  Admin["Angular admin :4200"] -->|"credentialed fetch for auth"| API["NestJS :3000 /api"]
-  Shop["Angular shop :4300"] -->|"credentialed fetch for auth"| API
+  Admin["Angular admin :4200"] -->|"credentialed API fetch"| API["NestJS :3000 /api"]
+  Shop["Angular shop :4300"] -->|"credentialed API fetch"| API
   API --> ORM["TypeORM repositories"]
   ORM --> PG["PostgreSQL :5433"]
   Import["district-import.sql"] --> PG
 ```
 
-Only authentication is currently connected from the browser to the API. Other frontend pages mostly render inline sample data. A working backend endpoint does not mean its corresponding frontend page consumes it.
+Authentication, scoped admin management, customer vendor applications and the public catalog connect to the API. Customer checkout/cart remain scaffolds. ManagementService owns scope/permission enforcement, transactions and marketplace records; see [management](backend/features/management.md).
 
 ## Repository map
 
@@ -19,8 +19,8 @@ Only authentication is currently connected from the browser to the API. Other fr
 | --- | --- |
 | apps/backend/src/main.ts | HTTP startup, CORS, validation, API prefix, Swagger |
 | apps/backend/src/app.module.ts | Configuration, database connection, feature registration |
-| apps/backend/src/modules | Auth, users, vendors, catalog, health |
-| apps/admin/src/app | Protected administration shell, auth client, demonstration pages |
+| apps/backend/src/modules | Auth, management, users, vendors, catalog, health |
+| apps/admin/src/app | Protected administration shell, auth client and scoped management forms |
 | apps/shop/src/app | Customer shell, account forms, cart scaffold, demonstration pages |
 | docker-compose.yml | Local PostgreSQL 16 Alpine and pgAdmin, persistent database volume |
 | district-import.sql | Transactional district seed/import against existing states |

@@ -1,15 +1,7 @@
 # Vendors feature
 
-## Files and controller
+VendorsModule imports ManagementModule. VendorsController uses AuthGuard and delegates GET /api/vendors to ManagementService.snapshot, returning `{data: snapshot.vendors}`. This replaces the previous static sample response with persisted, scope-filtered records. Platform/regional administrators and vendor administrators receive their permitted vendors; staff without vendor-administration visibility receive an empty list. Customers and unassigned/inactive vendor accounts are denied.
 
-`vendors.module.ts` registers VendorsController. `vendors.controller.ts` applies AuthGuard followed by AdminGuard at class level.
+The complete vendor model, contact/address fields, application DTO, manual creation, pending/active/rejected/blocked lifecycle, approval promotion transaction, regional permissions and audit history are owned by [management](management.md). Records are stored in management_records with kind vendor; vendorId equals the row ID. The customer account page submits applications; admin /vendors handles review. A manually created vendor needs a separately created vendor_admin account.
 
-GET /api/vendors invokes listVendors() and returns { data } with Northwind Labs (ven_1, active) and Blue River Goods (ven_2, pending). The response is static. Unauthorized callers receive 401; authenticated roles other than admin/superadmin receive 403.
-
-There is no vendor table, DTO, service, repository, onboarding/approval endpoint, or relationship between a user and vendor. The role names vendor and vendor_admin exist in account typing but are not sufficient to access this endpoint.
-
-## Why and limitations
-
-Guarding the demonstration administration endpoint establishes the intended access boundary before persistence is added. It does not implement tenant isolation or vendor self-service. Admin VendorsPage displays its own fixed examples without calling this route.
-
-A future vendor implementation must specify ownership, role scope, lifecycle statuses, validation, and whether platform administrators and vendor users receive different views.
+There is no document upload, identity verification service, banking/payout configuration, notification email, or editable vendor profile screen. Exact-text geography must agree with administrator assignments. Blocking a vendor denies management access to its team and removes its products from the public catalog. It preserves orders and other business history.

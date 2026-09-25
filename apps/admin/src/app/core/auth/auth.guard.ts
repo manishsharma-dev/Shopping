@@ -11,6 +11,14 @@ export const adminGuard: CanActivateFn = async () => {
     return router.createUrlTree(['/login']);
   }
   return (
-    ['admin', 'superadmin'].includes(auth.user()?.role ?? '') || router.createUrlTree(['/login'])
+    [
+      'admin',
+      'superadmin',
+      'state_admin',
+      'district_admin',
+      'vendor_admin',
+      'vendor',
+      'staff',
+    ].includes(auth.user()?.role ?? '') || router.createUrlTree(['/login'])
   );
 };

@@ -1,55 +1,21 @@
 # Administration application
 
-## Bootstrap, layout, and routes
+The standalone Angular app bootstraps App with router and theme configuration. App owns navigation, logout feedback and the authenticated shell; LoginPage retains the Material sign-in form. Successful admin, regional, vendor or staff login goes to `/dashboard`; customer login is rejected and signed out. API permission checks remain authoritative for active accounts, approved vendor scope and custom types.
 
-main.ts bootstraps App with appConfig. app.config.ts provides browser error listeners and routing. app.ts injects AuthService and Router, stores a logout error signal, and defines navigation links. app.html displays a sidebar/profile only for admin or superadmin and always renders router-outlet. Global styles.scss defines the Material theme and applies the two-column shell only to authenticated workspace routes. The login remains full-width; app.scss is empty. The login and workspace header expose a persistent theme toggle.
+The live pages and every form/state method are described in [Administration workspace](management.md). Routes `/dashboard`, `/users`, `/vendors`, `/products`, `/settings`, `/roles`, and `/orders` all use ManagementPage with a section value and adminGuard. Root redirects to dashboard. Login remains full-width with the drawer closed. Navigation is eager; no wildcard route or returnUrl handling exists.
 
-| Route | Component | Guard / state |
-| --- | --- | --- |
-| / | Redirect to /dashboard | Redirect destination is guarded |
-| /login | LoginPage | Public |
-| /dashboard | DashboardPage | adminGuard; static metrics |
-| /users | UsersPage | adminGuard; static role counts |
-| /vendors | VendorsPage | adminGuard; static vendor cards |
-| /products | ProductsPage | adminGuard; static product cards |
-| /settings | SettingsPage | adminGuard; static categories |
+AuthService restores a cookie session before the guard permits entry. A cached frontend identity can outlive a revoked server session; management requests independently reject invalid access. The shell shows User Type with legacy role fallback. Logout awaits the server before navigating and shows failures without pretending success.
 
-Routes eagerly import their components. There is no wildcard/not-found route or lazy loading. Hiding navigation is presentation only; backend guards protect actual data.
+The old standalone demonstration page classes and unused NgRx SessionStore remain on disk but are not routed. The legacy store cannot grant trusted identity. Settings now means categories and custom product fields, not a functional tax, shipping or security settings editor.
 
-## core/auth/auth.guard.ts
+See [authentication](authentication.md), [Material theme](theming.md), [backend management](../backend/features/management.md), and [generated files](admin/generated/README.md). DOM tests cover login/theme plus the management forms; build success alone does not establish full browser or accessibility verification.
 
-adminGuard injects AuthService and Router, awaits restore(), redirects to /login on restoration errors, and allows only admin/superadmin. Other roles redirect. No returnUrl is retained. Because restore caches its result, a previously loaded identity can outlive the server session in memory; API authorization remains necessary.
+## Responsive sidebar
 
-## pages/login/login.component.ts
+App uses the existing Angular Material sidenav container. Above 960px, the 280px vertical sidebar starts open in side mode; the header menu button and panel close button slide it out/in while the main content adjusts its width. At 960px and below, the sidebar starts closed and opens in over mode above full-width content with a backdrop. Its width is capped at viewport width minus 48px, and its navigation remains vertical.
 
-LoginPage imports FormsModule, Material form-field/input/button modules, and ThemeToggle. Its template is in login.component.html. It owns email/password strings plus busy/error signals. The email field is required, email-validated, and capped at 254. Password is required and capped at 128; sign-in does not enforce the new-account 12-character minimum.
+BreakpointObserver drives compact; desktopOpen and mobileOpen store separate in-memory choices. sidebarOpen combines workspace access with the active choice; setSidebarOpen changes it; closeMobileSidebar handles links (including the current route). NavigationEnd also closes the mobile drawer. Changing breakpoints closes the mobile drawer and retains the desktop choice. Subscriptions use takeUntilDestroyed. This preference is not persisted across reloads.
 
-submit() clears the error, sets busy, calls login, clears the password after successful login, then checks the returned role. A non-admin is logged out and shown an access error. Admins navigate to /dashboard. Catch displays the error and finally clears busy. Invalid/busy forms disable submission. The suffix button toggles password visibility. There is no registration, forgot-password, remember-me, or MFA UI. A local superadmin can be created with the documented development seed command.
+Material handles focus trapping, focus restoration, backdrop and Escape dismissal in overlay mode. The toggle exposes aria-expanded/aria-controls; the mobile panel is labeled as a dialog when visible. The header remains sticky in the independently scrolling main area, and long sidebar content scrolls within the drawer. Authenticated shell styles now live in app.scss; global styles retain the theme, base elements and scoped reduced-motion transition overrides. The router outlet stays mounted during toggling/resizing so unsaved page state survives. APIs, account permissions and data contracts are unchanged.
 
-## app.ts logout()
-
-logout() awaits the server, then routes to /login. A failure leaves the current identity visible and sets an error. The old demo login has been removed. Sidebar/profile rendering reads the live AuthService signal.
-
-## Every remaining page
-
-| File | Rendered content | Interaction / API |
-| --- | --- | --- |
-| pages/dashboard/dashboard.component.ts | Fixed revenue, orders, vendors, abandonment figures | Export report button has no handler; no metrics request |
-| pages/users/users.component.ts | Fixed counts for superadmin/admin/vendor admins/customers | No /users call or role editor |
-| pages/vendors/vendors.component.ts | Example vendor names/statuses | No /vendors call or approvals |
-| pages/products/products.component.ts | Example product cards/prices | No /catalog call or product editing |
-| pages/settings/settings.component.ts | Platform, tax/shipping, security, SEO categories | No forms or persistence |
-
-These standalone components use inline templates and inline styles; their classes have no business methods.
-
-## Legacy core/stores/session.store.ts
-
-SessionStore is an NgRx signalStore with user and isAuthenticated state. login(user) sets them; logout() clears them. Its SessionUser type lacks email and excludes customer. It is not the auth service and is not used by the current App. Do not use this local setter to establish a trusted identity.
-
-## Supporting files and limitations
-
-index.html supplies the HTML shell and base href. angular.json configures application builds, public assets, global styles, development serving, and unit tests. package.json defines Angular commands. app.spec.ts now covers the signed-out shell, Material login, superadmin dashboard redirect, protected navigation, and persisted theme preference.
-
-The shell has no sidebar column while signed out. Responsive auth forms become one column below 760px, and workspace navigation wraps on narrow screens. Real-browser visual verification remains separate from the passing DOM tests. See [generated files](admin/generated/README.md) for exact current templates and styles.
-
-See [Material theming](theming.md) for component styling and [superadmin setup](../backend/features/superadmin-setup.md) for local login provisioning.
+Component tests exercise desktop toggling, mobile overlay/backdrop/Escape/navigation dismissal, and desktop preference retention after responsive mode changes, alongside existing auth/theme coverage. These verify interaction and mode selection, not pixel-perfect screenshots at every viewport.

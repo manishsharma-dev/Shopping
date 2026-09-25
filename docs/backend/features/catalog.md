@@ -1,13 +1,9 @@
 # Catalog feature
 
-## Files and implementation
+CatalogModule imports ManagementModule. Public GET /api/catalog calls ManagementService.catalog and returns active product records belonging to active vendors. Sample products are removed. A new installation returns an empty catalog until an administrator/vendor creates and activates products.
 
-`catalog.module.ts` registers CatalogController. `catalog.controller.ts` exposes public GET /api/catalog. listProducts() returns { items } containing three fixed examples: Premium Hoodie (prod_1001, HD-1001, 89), Running Sneakers (prod_1002, SN-1002, 129), and Travel Backpack (prod_1003, BP-1003, 149).
+Items include id, name, sku, description, discounted price in major INR units, currency INR, imageUrl and stock. Unit price is rounded in minor units after the percentage discount. The public projection excludes moderation reasons, business contacts, user permissions and audit details. Blocked/flagged/inactive/draft/archived products and blocked vendors' products are excluded.
 
-There is no product table, entity, DTO, service, repository query, pagination, inventory check, currency field, search, or mutation endpoint. Numeric prices are illustrative; no monetary precision policy has been implemented.
+The [management guide](management.md) owns the product table representation, validation, custom fields, vendor scope, moderation, collections, discounts and manual-order stock rules. Admin /products writes through /manage; storefront CatalogPage fetches /catalog and displays price, description and availability with loading/error/empty states. No cart action or checkout submission is implemented by this catalog page. Images are recorded as HTTPS URLs but the initial public view does not render them.
 
-## Design status
-
-The controller is a demonstration contract so the shell can be developed before commerce persistence. The admin product cards and shop catalog independently hard-code similar values; neither fetches this endpoint. Their apparent agreement is not data synchronization.
-
-Future implementation needs product ownership, schema, currency and decimal handling, availability, query DTOs, authorization for mutations, and frontend API integration. Document these as new behavior rather than presenting this stub as a completed catalog.
+There is no search/pagination endpoint, configurable currency, uploaded asset storage, product variants or purchasable kit implementation. Collection IDs represent merchandising groups; they do not deplete component inventory and cannot be manually ordered.

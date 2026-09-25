@@ -1,56 +1,31 @@
 # HTTP API contracts
 
-Base URL for local development: `http://localhost:3000/api`. JSON field names are case-sensitive. All auth POST calls require `Content-Type: application/json` and `X-Shopping-Client: web`. Browsers must use `credentials: 'include'` to accept/send the session cookie and an allowed Origin. Requests without an Origin can be used by CLI tools if they include the custom header.
+Local base URL is http://localhost:3000/api. Auth and management POST requests require JSON and `X-Shopping-Client: web`. Browser requests must use `credentials: 'include'` and an allowed Origin. Authentication uses the HttpOnly shopping_session cookie, path /api, SameSite=Lax, eight-hour expiry, Secure in production. Neither passwords nor raw session tokens appear in responses.
 
-| Method and path | Input | Success | Authorization |
-| --- | --- | --- | --- |
-| POST /auth/register | name, email, password | 201; { user } and session cookie | Public; middleware checks |
-| POST /auth/login | email, password | 200; { user } and session cookie | Public; middleware checks |
-| GET /auth/me | Cookie | 200; { user } | AuthGuard |
-| POST /auth/logout | Cookie; body optional | 204; clears cookie | No AuthGuard; middleware checks |
-| GET /users | Cookie | 200; { data: publicUser[] } | AuthGuard then AdminGuard |
-| GET /vendors | Cookie | 200; { data: vendor[] } | AuthGuard then AdminGuard |
-| GET /catalog | None | 200; { items: product[] } | Public |
-| GET /health | None | 200; status, service, timestamp | Public |
-
-Public user shape:
-
-```json
-{
-  "user": {
-    "id": "a UUID",
-    "name": "Example Customer",
-    "email": "customer@example.com",
-    "role": "customer"
-  }
-}
-```
-
-Tokens, password hashes, and createdAt are excluded. No endpoint accepts a client-selected role. DTO whitelisting strips unknown fields.
-
-## Registration example
-
-```http
-POST /api/auth/register
-Content-Type: application/json
-X-Shopping-Client: web
-
-{"name":"Example Customer","email":"customer@example.com","password":"example-long-password"}
-```
-
-The cookie is named shopping_session, scoped to /api, host-only (no Domain attribute), HttpOnly, SameSite=Lax, and expires after eight hours. It is Secure when NODE_ENV is production. Apps on different localhost ports share the same host cookie; signing out in one can invalidate the session another app was using, though their in-memory state is not synchronized.
-
-## Errors
-
-| Status | Condition |
+| Endpoint | Behavior and access |
 | --- | --- |
-| 400 | Invalid DTO, including short registration password, invalid email, blank normalized name |
-| 401 | Unknown/wrong credentials, malformed token, missing/expired/revoked session, missing user |
-| 403 | Missing custom header, disallowed supplied Origin, or insufficient admin role |
-| 409 | Duplicate account email |
-| 429 | Auth request limit reached; Retry-After in seconds |
-| 500 | Unhandled storage/runtime failure |
+| POST /auth/register | name, email, password; creates customer with User Type Customer; returns {user} plus cookie |
+| POST /auth/login | email/password; returns {user} plus cookie; blocked accounts rejected |
+| GET /auth/me | Current database-backed public identity; requires valid active account/session |
+| POST /auth/logout | Idempotent current-session revocation; 204 and clear cookie |
+| GET /users | Legacy latest-100 user list; admin/superadmin only; {data: publicUser[]} |
+| GET /vendors | Live scoped vendors via management permissions; {data: vendor[]} |
+| GET /catalog | Public active products of active vendors only; {items}; discounted INR prices |
+| GET /manage | Live scoped administration snapshot and optional exact state/district/vendorId filters |
+| GET /manage/applications | Current user's own submitted vendor records |
+| POST /manage/apply | Customer business application; pending review |
+| POST /manage/users | Authorized subordinate account creation with level/type/scope |
+| POST /manage/users/:id/status | Subordinate account activation/blocking with reason |
+| POST /manage/:kind | Create vendor/type/category/field/product/manual order |
+| POST /manage/:kind/:id | Version-checked product edits or vendor/product/order status changes |
+| GET /health | Public liveness response |
 
-Nest returns JSON errors with message/statusCode and often an error label. Validation message may be an array. Clients join arrays for display. GET /auth/me returning 401 is normal for a signed-out visitor. Logout is idempotent: no valid session is required, but the middleware requirements still apply.
+See [management contracts](features/management.md) for all kind-specific request fields, DTO validation, permissions, lifecycle transitions, status codes, and persistence. Business POST bodies use `{data:{...},version?:positiveInteger}`; expected version is mandatory for existing records. New immutable types/categories/fields have no update/delete operation. No HTTP endpoint grants superadmin.
 
-There are no pagination query parameters, mutation endpoints for users/vendors/products, district APIs, or order APIs. Swagger at /docs is supplementary and currently less detailed than these contracts.
+Public users include id, name, email, role, userType, nullable userTypeId/state/district/vendorId, and active. role is one of customer/superadmin/admin/state_admin/district_admin/vendor_admin/vendor/staff. Account creation and administrative scope are server-managed; public registration ignores supplied roles/types/scopes. The legacy users endpoint is still limited to 100 rows; management listing uses a separate permission-aware snapshot.
+
+Catalog items expose id, name, sku, description, discounted price in major INR units, currency, imageUrl, stock. Internal custom fields, moderation reasons, vendor contact information and audit records are not public. No storefront order/payment endpoint exists.
+
+Auth errors: 400 invalid input, 401 unknown/wrong password or invalid/expired/blocked session, 403 untrusted header/origin or insufficient role, 409 duplicate email, 429 auth throttle. Management adds 404 missing record and 409 stale version/stock conflict. Nest error messages may be strings or arrays. Auth token/session behavior and normalization are detailed in [authentication](features/authentication.md). Swagger is supplementary; explicit guide contracts are authoritative for this implementation.
+
+POST /manage/users/:id/type reassigns a scoped staff account to an existing permitted User Type using data.userTypeId and reason; see the management guide.

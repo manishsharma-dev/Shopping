@@ -27,7 +27,17 @@ export class LoginPage {
     try {
       await this.auth.login(this.email, this.password);
       this.password = '';
-      if (!['admin', 'superadmin'].includes(this.auth.user()!.role)) {
+      if (
+        ![
+          'admin',
+          'superadmin',
+          'state_admin',
+          'district_admin',
+          'vendor_admin',
+          'vendor',
+          'staff',
+        ].includes(this.auth.user()!.role)
+      ) {
         await this.auth.logout();
         throw new Error('This account does not have administrator access.');
       }

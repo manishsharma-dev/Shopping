@@ -11,3 +11,5 @@ The admin and storefront are independent Angular standalone applications. Both u
 - [Shop file-by-file reference](shop/generated/README.md)
 
 Each generated file document includes current imports, component/class members, declarations, and source. The two auth service copies are documented separately in those indexes even though their current behavior is the same.
+
+- [Live administration workspace](management.md): forms, permissions, state, routes and validation.

@@ -1,7 +1,6 @@
+﻿import { ManagementModule } from '../management/management.module';
 import { Module } from '@nestjs/common';
 import { VendorsController } from './vendors.controller';
 
-@Module({
-  controllers: [VendorsController],
-})
+@Module({ imports: [ManagementModule], controllers: [VendorsController] })
 export class VendorsModule {}

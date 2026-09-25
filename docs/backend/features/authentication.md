@@ -40,7 +40,7 @@ The DTO uses inheritance to share email rules. The global validation pipe strips
 | derive | password + salt ? Promise&lt;Buffer&gt; | Async scrypt; 64-byte key, N=32768, r=8, p=1, 64 MiB maxmem; rejects crypto errors |
 | hashPassword | password to salt/hash string | Shared salted scrypt helper for registration and local admin seed |
 | sessionHash | token ? 64-character hex | SHA-256 token lookup key |
-| publicUser | User ? id/name/email/role | Explicit safe response projection |
+| publicUser | User ? public identity/type/scope/active | Explicit safe response projection |
 | SESSION_MS | Constant | Eight hours |
 | register | RegisterDto ? token + public user | Random 16-byte salt; save customer; create session; map PostgreSQL 23505 to 409 |
 | login | LoginDto ? token + public user | Query email with explicit passwordHash selection; derive and compare; 401 for mismatch/unknown user |
@@ -64,7 +64,7 @@ sessionToken splits the Cookie header at semicolons and finds shopping_session; 
 
 allowedOrigins splits AUTH_ORIGINS on commas and trims empty entries. AuthSecurityMiddleware.use always sets Cache-Control: no-store for auth routes. For POSTs it requires the custom header and rejects a supplied Origin that is not allowed. Login/register attempts share a per-IP counter: 20 per 15 minutes, including validation failures and successful attempts. Expired map entries are removed on later login/register calls. A 10,000-key cap limits the map size. The map is process-local and resets on restart; it is not a distributed limiter.
 
-The custom header prevents ordinary cross-origin HTML form submission from satisfying the auth request contract, while credentialed browser requests are constrained by CORS and Origin checks. This middleware is bound to AuthController only; future mutation controllers need an explicit protection decision.
+The custom header prevents ordinary cross-origin HTML form submission from satisfying the auth request contract, while credentialed browser requests are constrained by CORS and Origin checks. The same middleware is also bound to ManagementController for every management POST. Management permissions are enforced by its service, independently of the legacy AdminGuard.
 
 ## End-to-end flow
 
@@ -101,3 +101,8 @@ When changing this feature, review database fields, DTO inheritance, response pr
 ## Local administrator provisioning
 
 An explicit seed command can create a local superadmin using environment settings. It never runs automatically, resets an existing account, or promotes a customer. [Superadmin setup](superadmin-setup.md) documents the command, validation, and tests. Customer registration still always creates customer.
+
+
+## User Type and active status
+
+User now stores userType, optional userTypeId, region/vendor scope and active status. publicUser includes these safe fields. Existing non-customer accounts with the old Customer default receive a role-derived display label. Login and authenticate reject blocked accounts. Public registration still forces customer and never accepts privileged scope or user types. Management creates subordinate accounts and promotes approved vendor applicants; see [management](management.md).

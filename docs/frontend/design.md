@@ -22,10 +22,16 @@ For cart work, fix provider scope first and decide whether the state is account-
 
 ## Styling and deployment constraints
 
-Global styles define Material themes and shells. Auth templates are external HTML with shared auth-layout.scss; most demonstration pages retain inline templates/styles using Material color tokens. No shared design-system package, localization, accessibility audit, or responsive admin redesign is present. Build success does not prove runtime dependency injection or browser behavior.
+Global styles define Material themes and shells. Auth templates are external HTML with shared auth-layout.scss; most demonstration pages retain inline templates/styles using Material color tokens. No shared design-system package, localization or accessibility audit is present. The admin shell has a responsive sliding side/overlay drawer. Build success does not prove runtime dependency injection or browser behavior.
 
 Auth API URLs are currently hard-coded. Deployed frontend origins must match AUTH_ORIGINS, and production cookie transport requires HTTPS. Both current apps assume a same-site API. No frontend environment configuration, reverse-proxy rule, or deployment pipeline is included.
 
 ## Material theme decision
 
 Both apps use Angular Material 22 fields and buttons with azure/cyan palettes and CSS color-scheme tokens. ThemeService restores a saved local preference or the initial OS setting; the toggle persists per origin. See [theming](theming.md) for files, methods, breakpoints, and validation.
+
+## Management UI
+
+The live administration routes share a standalone ManagementPage with server snapshots and explicit draft/action state. Material buttons, labeled native fields, responsive cards and scrollable tables implement creation and lifecycle flows. Custom product controls come from immutable vendor field definitions; all authorization, stock and type validation are repeated on the server. See [workspace](management.md). No new UI dependency was added.
+
+The admin shell uses Material sidenav side mode above 960px and modal over mode below it. This keeps navigation vertical and preserves content space on phones. Drawer state is independent from feature forms, and toggling does not recreate the router outlet. Existing Material/CDK dependencies provide focus and backdrop behavior; reduced-motion users get no drawer transitions. See [admin shell](admin.md).

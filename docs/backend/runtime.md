@@ -12,7 +12,7 @@ The port is `Number(process.env.PORT ?? 3000)`. Startup logs the listener addres
 
 ConfigModule is global. TypeOrmModule.forRootAsync reads connection settings through ConfigService. Entities registered by imported feature modules are auto-loaded. DB_SYNCHRONIZE and DB_LOGGING are parsed by comparing their string values to `true`; their code defaults are false. The sample environment enables development synchronization.
 
-Imports are AuthModule, HealthModule, CatalogModule, UsersModule, and VendorsModule. The database must be reachable for normal application initialization.
+Imports include AuthModule, ManagementModule, HealthModule, CatalogModule, UsersModule, and VendorsModule. ManagementModule registers management_records and the scoped administration service; its controller uses the same POST header/origin middleware as auth. The database must be reachable for normal application initialization.
 
 ## Scaffold root files
 
