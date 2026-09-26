@@ -44,9 +44,9 @@ label {
   gap: 8px;
   font-size: 14px;
 }
-input,
+input:not([matInput]),
 select,
-textarea {
+textarea:not([matInput]) {
   box-sizing: border-box;
   width: 100%;
   padding: 12px;
@@ -55,6 +55,13 @@ textarea {
   background: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: inherit;
+}
+mat-form-field {
+  min-width: 0;
+  width: 100%;
+}
+mat-checkbox {
+  margin: 6px 16px 6px 0;
 }
 textarea {
   min-height: 100px;

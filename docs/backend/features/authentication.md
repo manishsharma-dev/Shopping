@@ -106,3 +106,5 @@ An explicit seed command can create a local superadmin using environment setting
 ## User Type and active status
 
 User now stores userType, optional userTypeId, region/vendor scope and active status. publicUser includes these safe fields. Existing non-customer accounts with the old Customer default receive a role-derived display label. Login and authenticate reject blocked accounts. Public registration still forces customer and never accepts privileged scope or user types. Management creates subordinate accounts and promotes approved vendor applicants; see [management](management.md).
+
+Agent is an administrative role; it is provisioned by a superior through a selected User Type. Auth registration still strips role/type fields and creates customers only. Vendor/Agent public registration is deferred. Business permissions are resolved separately by /manage/access, including pending-vendor restrictions.

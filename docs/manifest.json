@@ -13,7 +13,8 @@
       "docs": [
         "docs/backend/features/management.md",
         "docs/backend/database.md",
-        "docs/backend/api.md"
+        "docs/backend/api.md",
+        "docs/backend/features/user-types.md"
       ]
     },
     {

@@ -4,7 +4,7 @@
 
 Both `apps/admin/src/app/core/auth/auth.service.ts` and `apps/shop/src/app/core/auth/auth.service.ts` define a root-provided AuthService and SessionUser type. These are separate implementations, not imports from a shared package.
 
-SessionUser contains id, name, email, role and optional userType/userTypeId/state/district/vendorId/active fields for compatibility with legacy clients. Role also includes state_admin, district_admin and staff. The current server always supplies the public User Type. There is no frontend password-hash field or token-storage field.
+SessionUser contains id, name, email, role and optional userType/userTypeId/state/district/vendorId/active fields for compatibility with legacy clients. Role also includes state_admin, district_admin, agent and staff. The current server always supplies the public User Type. There is no frontend password-hash field or token-storage field.
 
 | Operation | Request object | Server DTO |
 | --- | --- | --- |
@@ -41,7 +41,7 @@ Both local apps share the backend's host cookie even though they use different p
 
 ## Component connections
 
-Admin LoginPage calls login, checks platform, regional, vendor and staff levels, logs out other roles, and navigates to /dashboard. Admin's route guard restores before allowing protected navigation. The admin App calls logout and navigates to /login after success.
+Admin LoginPage calls login, checks platform, regional, agent, vendor and staff levels, logs out other roles, and navigates to /dashboard. Admin's route guard restores before allowing protected navigation. The admin App calls logout and navigates to /login after success.
 
 Shop AccountPage restores in its constructor, switches between login/registration forms, calls the selected operation, and displays the authenticated name/email or an error. Its logout stays on /account.
 
@@ -55,4 +55,6 @@ Native fetch keeps the first auth client small but has no global interceptor, co
 
 Both auth forms now use outlined Material fields, attached validation messages, pending labels, and show/hide-password suffix buttons. AccountPage.switchMode resets the form mode feedback and password visibility. The request and cookie contracts are unchanged. See [theme documentation](theming.md).
 
-The admin guard/login/shell admit regional and vendor teams as well as platform administrators. The management API independently checks active vendor scope and custom permissions. Customer AccountPage displays User Type and embeds VendorApplication for signed-in customers; that form has its own loading/error/submission state and never changes the registration role contract.
+The admin guard/login/shell admit regional and vendor teams as well as platform administrators. The management API independently checks active vendor scope and custom permissions. Customer AccountPage displays User Type and no longer embeds VendorApplication; that application form is now disabled and unmounted because public vendor registration is deferred.
+
+AccessService loads current management capabilities on each guarded navigation. User Type permissions control menu visibility and direct-route authorization independently of the cached identity. Customer registration remains available only through the shop; the administration creation endpoint requires a lower non-customer User Type.

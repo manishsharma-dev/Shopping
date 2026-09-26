@@ -1,5 +1,4 @@
-﻿import { VendorApplication } from './vendor-application.component';
-import { Component, inject, signal } from '@angular/core';
+﻿import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,7 +11,6 @@ import { AuthService } from '../../core/auth/auth.service';
   standalone: true,
   imports: [
     FormsModule,
-    VendorApplication,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,

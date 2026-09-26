@@ -53,9 +53,6 @@
         <button mat-stroked-button (click)="logout()" [disabled]="busy()">
           {{ busy() ? 'Signing out...' : 'Sign out' }}
         </button>
-        @if (user.role === 'customer') {
-          <app-vendor-application />
-        }
       } @else {
         <p class="eyebrow">{{ registering() ? 'Join the community' : 'Your Northstar account' }}</p>
         <h1>{{ registering() ? 'Make it yours.' : 'Welcome back.' }}</h1>

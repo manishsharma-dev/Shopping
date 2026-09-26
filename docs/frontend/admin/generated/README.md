@@ -11,6 +11,7 @@ Generated from current repository files. Feature guides explain behavior; these 
 - [apps/admin/src/app/app.scss](files/src/app/app.scss.md)
 - [apps/admin/src/app/app.spec.ts](files/src/app/app.spec.ts.md)
 - [apps/admin/src/app/app.ts](files/src/app/app.ts.md)
+- [apps/admin/src/app/core/auth/access.service.ts](files/src/app/core/auth/access.service.ts.md)
 - [apps/admin/src/app/core/auth/auth.guard.ts](files/src/app/core/auth/auth.guard.ts.md)
 - [apps/admin/src/app/core/auth/auth.service.ts](files/src/app/core/auth/auth.service.ts.md)
 - [apps/admin/src/app/core/stores/session.store.ts](files/src/app/core/stores/session.store.ts.md)

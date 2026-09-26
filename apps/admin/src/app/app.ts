@@ -1,3 +1,4 @@
+import { AccessService } from './core/auth/access.service';
 import { ThemeToggle } from './core/theme/theme-toggle.component';
 import { MatButtonModule } from '@angular/material/button';
 import { Component, inject, signal } from '@angular/core';
@@ -55,16 +56,7 @@ export class App {
     this.mobileOpen.set(false);
   }
 
-  protected readonly navItems = [
-    { label: 'Dashboard', path: '/dashboard' },
-    { label: 'Users', path: '/users' },
-    { label: 'Vendors', path: '/vendors' },
-    { label: 'Products', path: '/products' },
-    { label: 'User types', path: '/roles' },
-    { label: 'Orders', path: '/orders' },
-    { label: 'Categories & fields', path: '/settings' },
-  ];
-
+  protected readonly access = inject(AccessService);
   protected isWorkspace() {
     return (
       this.router.url !== '/login' &&
@@ -76,6 +68,7 @@ export class App {
         'vendor_admin',
         'vendor',
         'staff',
+        'agent',
       ].includes(this.session.user()?.role ?? '')
     );
   }

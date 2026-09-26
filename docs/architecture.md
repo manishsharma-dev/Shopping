@@ -11,7 +11,7 @@ flowchart LR
   Import["district-import.sql"] --> PG
 ```
 
-Authentication, scoped admin management, customer vendor applications and the public catalog connect to the API. Customer checkout/cart remain scaffolds. ManagementService owns scope/permission enforcement, transactions and marketplace records; see [management](backend/features/management.md).
+Authentication, scoped admin management, admin/agent vendor submissions and the public catalog connect to the API. Customer checkout/cart remain scaffolds. ManagementService owns scope/permission enforcement, transactions and marketplace records; see [management](backend/features/management.md).
 
 ## Repository map
 

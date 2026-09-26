@@ -33,7 +33,7 @@
           </button>
         </div>
         <nav class="nav" aria-label="Administration">
-          @for (item of navItems; track item.path) {
+          @for (item of access.menu(); track item.path) {
             <a
               [routerLink]="item.path"
               routerLinkActive="active"

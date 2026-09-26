@@ -12,7 +12,8 @@ export type SessionUser = {
     | 'vendor_admin'
     | 'state_admin'
     | 'district_admin'
-    | 'staff';
+    | 'staff'
+    | 'agent';
   userType?: string;
   userTypeId?: string;
   state?: string;

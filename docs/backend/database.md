@@ -23,7 +23,7 @@ Owned by `auth.entities.ts`'s User; read by both auth and users modules.
 | role | varchar | No | customer | Server-managed authorization role |
 | createdAt | timestamp without time zone | No | now() | TypeORM creation timestamp |
 
-Role's TypeScript union contains customer, superadmin, admin, state_admin, district_admin, vendor, vendor_admin, and staff. PostgreSQL stores varchar, not an enum/check constraint; direct SQL can write other strings. Email uniqueness is case-sensitive at the database layer; API normalization is what makes normal registration case-insensitive. Direct writes must preserve that invariant. select:false affects ORM queries, not database permissions. Auth login explicitly selects the password hash.
+Role's TypeScript union contains customer, superadmin, admin, state_admin, district_admin, vendor, vendor_admin, staff, and agent. PostgreSQL stores varchar, not an enum/check constraint; direct SQL can write other strings. Email uniqueness is case-sensitive at the database layer; API normalization is what makes normal registration case-insensitive. Direct writes must preserve that invariant. select:false affects ORM queries, not database permissions. Auth login explicitly selects the password hash.
 
 ## auth_sessions
 
@@ -80,3 +80,5 @@ Users now also maps userType varchar(100) NOT NULL DEFAULT Customer; userTypeId 
 The new management_records table holds vendor/type/category/field/product/order/audit rows. Its ownership columns, JSON payload schema, indexes, validation, logical relationships and transaction rules are detailed in [management tables](features/management.md). No new table has been assumed to exist from the older four-table observation. Integration tests create this table only in random test schemas.
 
 `apps/backend/src/database/management-upgrade.sql` adds columns/table/indexes and backfills non-customer type labels transactionally. Review and apply before a synchronization-disabled deployment; development can synchronize on startup. Keep additive fields/table during an application rollback to preserve business data. The upgrade does not import geography or assign legacy vendor accounts to a business automatically.
+
+User Type definitions now store role, permissions and protected in existing JSONB payloads; vendor approvals store approvedAt/approvedBy. Startup idempotently initializes default type records. No additional columns are required. Geography selectors validate canonical names against public.states/districts; assignments remain string columns. See [hierarchy](features/user-types.md) for legacy-type and pending-vendor handling.

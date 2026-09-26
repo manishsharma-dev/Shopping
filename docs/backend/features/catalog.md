@@ -1,6 +1,6 @@
 # Catalog feature
 
-CatalogModule imports ManagementModule. Public GET /api/catalog calls ManagementService.catalog and returns active product records belonging to active vendors. Sample products are removed. A new installation returns an empty catalog until an administrator/vendor creates and activates products.
+CatalogModule imports ManagementModule. Public GET /api/catalog calls ManagementService.catalog and returns active product records belonging to active vendors with recorded approval. Sample products are removed. A new installation returns an empty catalog until an administrator/vendor creates and activates products.
 
 Items include id, name, sku, description, discounted price in major INR units, currency INR, imageUrl and stock. Unit price is rounded in minor units after the percentage discount. The public projection excludes moderation reasons, business contacts, user permissions and audit details. Blocked/flagged/inactive/draft/archived products and blocked vendors' products are excluded.
 

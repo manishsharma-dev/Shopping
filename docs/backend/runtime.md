@@ -35,3 +35,7 @@ See the [generated file index](generated/README.md) for exact current contents. 
 ## Explicit development seed
 
 src/scripts/seed-superadmin.ts is a CLI entrypoint, not an HTTP route or an automatic bootstrap provider. npm run seed:superadmin builds and runs it. It rejects production before database initialization, and its helper validates again. Configuration comes from SEED_SUPERADMIN_EMAIL and SEED_SUPERADMIN_PASSWORD. See [setup](features/superadmin-setup.md).
+
+## User Type initialization
+
+ManagementService.onModuleInit initializes missing stable default type records under the management transaction lock. This runs during normal module initialization and requires the existing management_records schema. It never creates user accounts and preserves soft-deleted definitions. Geography lookup reads separately provisioned public reference tables. See [User Types](features/user-types.md).

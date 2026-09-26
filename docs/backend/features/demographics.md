@@ -2,7 +2,7 @@
 
 ## Ownership and schema
 
-The geographic data is database-only. There are no Nest entities, DTOs, services, controllers, or frontend selectors for it. [Database documentation](../database.md) lists every column and constraint.
+The geographic data is database-only. There are no TypeORM entities for it. ManagementService reads states/districts through GET /manage/geography for administration selectors and validates required regional assignments. [Database documentation](../database.md) lists every column and constraint.
 
 states has a serial ID, unique name, and State/Union Territory classification. districts has a serial ID, state foreign key, district name, and uniqueness on state_id/name. Deleting a state cascades to its districts. Existing local data was imported from the user's SQL; geographic accuracy and currency were not independently audited.
 

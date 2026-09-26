@@ -31,6 +31,7 @@ Generated from current repository files. Feature guides explain behavior; these 
 - [apps/backend/src/modules/management/management.module.ts](files/src/modules/management/management.module.ts.md)
 - [apps/backend/src/modules/management/management.policy.ts](files/src/modules/management/management.policy.ts.md)
 - [apps/backend/src/modules/management/management.service.ts](files/src/modules/management/management.service.ts.md)
+- [apps/backend/src/modules/management/management.types.ts](files/src/modules/management/management.types.ts.md)
 - [apps/backend/src/modules/users/users.controller.ts](files/src/modules/users/users.controller.ts.md)
 - [apps/backend/src/modules/users/users.module.ts](files/src/modules/users/users.module.ts.md)
 - [apps/backend/src/modules/vendors/vendors.controller.ts](files/src/modules/vendors/vendors.controller.ts.md)

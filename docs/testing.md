@@ -34,7 +34,7 @@ Builds check compilation, not browser runtime, responsiveness, or successful car
 | Auth POST returns 403 | X-Shopping-Client:web header and exact AUTH_ORIGINS match |
 | Browser says it cannot reach server | API running on localhost:3000, hostname/CORS, network console |
 | Login returns 401 | Email/password or expired/missing cookie; unknown and wrong credentials intentionally share response |
-| Admin login rejects account | A permitted admin/regional/vendor/staff role is required; management also checks active vendor/type scope; registration creates customer |
+| Admin login rejects account | A permitted admin/regional/agent/vendor/staff role is required; management also checks active vendor/type scope; registration creates customer |
 | Auth returns 429 | Wait Retry-After; successes and invalid input count against the same IP window |
 | Cookie not sent in deployment | HTTPS for Secure cookie, path /api, credentialed fetch, same-site assumptions |
 | UI says signed in after logout elsewhere | Frontend identity is cached with no cross-tab sync |
@@ -53,3 +53,5 @@ Run npm --prefix apps/admin test -- --watch=false and npm --prefix apps/shop tes
 Run `npm --prefix apps/backend run test:e2e -- --runInBand management.e2e-spec.ts auth.e2e-spec.ts`. The management suite provisions an isolated random manage_test_ schema with User, AuthSession and ManagementRecord, and removes only that schema afterward. It checks region/vendor isolation, narrowed filters, approval promotion, delegated permissions, products/fields/discounts, concurrent stock reservation, cancellation, stale versions, product moderation and vendor blocking. The existing auth suite is also retained. No live business records are created by these tests.
 
 Run `npm --prefix apps/admin test -- --watch=false` and the equivalent shop command. New admin component tests cover dynamic fields, price-to-minor-unit conversion, stale-draft retention and separate acceptance/management permissions. These tests do not substitute for production migration rehearsal or full browser visual QA. The manual migration must be reviewed separately for a deployed database.
+
+Hierarchy checks additionally cover peer/superior refusal, registration-only customers, mandatory state/district pairing, protected/assigned type deletion, restricted regional capabilities, Agent submission without approval rights and pending vendor permissions. Geographic fixtures are mocked in the isolated backend test schema. Admin tests cover hidden menus and direct-route denial plus required Material state/district fields.

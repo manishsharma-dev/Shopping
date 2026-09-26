@@ -1,4 +1,9 @@
-﻿import { Component, inject, signal } from '@angular/core';
+import { AccessService } from '../../core/auth/access.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -19,6 +24,11 @@ type Row = {
 };
 type Snapshot = {
   permissions: string[];
+  hierarchy?: number;
+  typeLevels?: { role: string; permissions: string[] }[];
+  assignableTypes?: Row[];
+  vendorOptions?: { id: string; name: string; status: string }[];
+  vendorStatus?: string | null;
   users: any[];
   vendors: Row[];
   types: Row[];
@@ -31,12 +41,25 @@ type Snapshot = {
 };
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatCheckboxModule,
+  ],
   templateUrl: './management.component.html',
   styleUrl: './management.component.scss',
 })
 export class ManagementPage {
   readonly auth = inject(AuthService);
+  readonly access = inject(AccessService);
+  readonly geography = signal<{
+    states: { id: number; name: string }[];
+    districts: { id: number; name: string; state: string }[];
+  }>({ states: [], districts: [] });
   readonly route = inject(ActivatedRoute);
   readonly snapshot = signal<Snapshot | null>(null);
   readonly busy = signal(false);
@@ -65,6 +88,8 @@ export class ManagementPage {
       this.typeTarget = null;
       this.notice.set('User type updated.');
       this.snapshot.set(await this.request('?' + new URLSearchParams(this.filters)));
+      this.access.set(this.snapshot()?.permissions ?? []);
+      this.geography.set(await this.request('/geography'));
     } catch (e) {
       this.error.set((e as Error).message);
     } finally {
@@ -97,22 +122,51 @@ export class ManagementPage {
     );
   }
   get canCreateType() {
-    return ['superadmin', 'admin', 'vendor_admin'].includes(this.auth.user()?.role || '');
+    return this.can('types');
   }
   can(permission: string) {
     return this.snapshot()?.permissions.includes(permission) ?? false;
   }
   get roles() {
-    const role = this.auth.user()?.role;
-    return role === 'superadmin'
-      ? ['admin', 'state_admin', 'district_admin', 'vendor_admin', 'staff', 'customer']
-      : role === 'admin'
-        ? ['state_admin', 'district_admin', 'vendor_admin', 'staff', 'customer']
-        : role === 'state_admin'
-          ? ['district_admin', 'vendor_admin', 'staff']
-          : role === 'district_admin'
-            ? ['vendor_admin', 'staff']
-            : ['staff'];
+    return this.snapshot()?.typeLevels?.map((t) => t.role) ?? [];
+  }
+  get selectedRole() {
+    const type = this.availableTypes.find((t) => t.id === this.draft['userTypeId']);
+    return type ? type.data['role'] || 'staff' : '';
+  }
+  selectUserType() {
+    const type = this.availableTypes.find((t) => t.id === this.draft['userTypeId']);
+    if (type?.vendorId) this.draft['vendorId'] = type.vendorId;
+    if (type?.state) this.draft['state'] = type.state;
+    if (type?.district) this.draft['district'] = type.district;
+  }
+  get vendorOptions() {
+    const type =
+      this.formKind === 'users'
+        ? this.availableTypes.find((t) => t.id === this.draft['userTypeId'])
+        : undefined;
+    return (this.snapshot()?.vendorOptions ?? []).filter(
+      (v) => !type?.vendorId || v.id === type.vendorId,
+    );
+  }
+  get districtOptions() {
+    return this.geography().districts.filter((d) => d.state === this.draft['state']);
+  }
+  get typePermissions() {
+    return (
+      this.snapshot()?.typeLevels?.find((t) => t.role === this.draft['role'])?.permissions ?? []
+    );
+  }
+  canDeleteType(t: Row) {
+    return this.can('types') && t.data['deletable'] === true;
+  }
+  get replacementTypes() {
+    return this.availableTypes.filter(
+      (t) =>
+        (t.data['role'] || 'staff') ===
+          (this.typeTarget?.role === 'vendor' ? 'vendor_admin' : this.typeTarget?.role) &&
+        (!t.vendorId || t.vendorId === this.typeTarget?.vendorId),
+    );
   }
   get vendorFields() {
     return (
@@ -140,11 +194,7 @@ export class ManagementPage {
     );
   }
   get availableTypes() {
-    return (
-      this.snapshot()?.types.filter(
-        (c) => !c.vendorId || c.vendorId === (this.auth.user()?.vendorId || this.draft['vendorId']),
-      ) ?? []
-    );
+    return this.snapshot()?.assignableTypes ?? [];
   }
   label(value: string) {
     return value.replace(/([A-Z])/g, ' $1').replaceAll('_', ' ');
@@ -170,6 +220,8 @@ export class ManagementPage {
     this.error.set('');
     try {
       this.snapshot.set(await this.request('?' + new URLSearchParams(this.filters)));
+      this.access.set(this.snapshot()?.permissions ?? []);
+      this.geography.set(await this.request('/geography'));
     } catch (e) {
       this.error.set((e as Error).message);
     } finally {
@@ -191,7 +243,8 @@ export class ManagementPage {
         }
       : {
           name: '',
-          role: this.roles[0],
+          role: this.roles[0] || 'staff',
+          userTypeId: '',
           vendorId: this.auth.user()?.vendorId || '',
           state: this.auth.user()?.state || '',
           district: this.auth.user()?.district || '',
@@ -223,7 +276,7 @@ export class ManagementPage {
     try {
       const data = { ...this.draft };
       if (this.formKind === 'type')
-        data['permissions'] = this.permissionNames.filter((p) => this.selectedPermissions[p]);
+        data['permissions'] = this.typePermissions.filter((p) => this.selectedPermissions[p]);
       if (this.formKind === 'field')
         data['options'] = (data['optionsText'] || '')
           .split(',')
@@ -245,6 +298,7 @@ export class ManagementPage {
       this.cancel();
       this.notice.set('Saved successfully.');
       this.snapshot.set(await this.request('?' + new URLSearchParams(this.filters)));
+      this.access.set(this.snapshot()?.permissions ?? []);
     } catch (e) {
       this.error.set((e as Error).message);
     } finally {
@@ -273,6 +327,7 @@ export class ManagementPage {
       this.pendingAction = null;
       this.notice.set('Change recorded in the activity log.');
       this.snapshot.set(await this.request('?' + new URLSearchParams(this.filters)));
+      this.access.set(this.snapshot()?.permissions ?? []);
     } catch (e) {
       this.error.set((e as Error).message);
     } finally {

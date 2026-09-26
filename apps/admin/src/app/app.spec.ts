@@ -28,7 +28,17 @@ describe('Admin sign-in and theme', () => {
       vi.fn().mockResolvedValue({
         ok: true,
         json: async () => ({
-          permissions: [],
+          permissions: [
+            'team',
+            'vendors',
+            'products',
+            'types',
+            'orders_manage',
+            'categories',
+            'reports',
+          ],
+          states: [],
+          districts: [],
           users: [],
           vendors: [],
           types: [],
@@ -172,6 +182,32 @@ describe('Admin sign-in and theme', () => {
     expect(TestBed.inject(Router).url).toBe('/dashboard');
     expect(element.querySelector('.app-shell')?.classList.contains('authenticated')).toBe(true);
     expect(element.textContent).toContain('Marketplace dashboard');
+  });
+  it('hides denied menus and blocks direct route navigation', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        permissions: ['products'],
+        users: [],
+        vendors: [],
+        types: [],
+        categories: [],
+        fields: [],
+        products: [],
+        orders: [],
+        audit: [],
+        stats: null,
+        states: [],
+        districts: [],
+      }),
+    } as Response);
+    const fixture = await openWorkspace();
+    expect(fixture.nativeElement.querySelector('.nav a[href="/vendors"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.nav a[href="/users"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.nav a[href="/products"]')).toBeTruthy();
+    await TestBed.inject(Router).navigateByUrl('/vendors');
+    await fixture.whenStable();
+    expect(TestBed.inject(Router).url).toBe('/dashboard');
   });
   it('redirects signed-out dashboard navigation to login', async () => {
     await openLogin();

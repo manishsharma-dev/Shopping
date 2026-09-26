@@ -19,7 +19,7 @@ All routes are currently public and eagerly loaded. Checkout has no customer gua
 
 File: pages/account/account.component.ts. Dependencies: FormsModule, root AuthService, and Material form-field/input/button/spinner modules. The template is in account.component.html; the shared auth-layout.scss controls its responsive panels.
 
-State includes registering, busy, error, loading signals and name/email/password form strings. The constructor calls restore; a failure is shown as an error, and loading always clears. When authenticated, the page displays name/email/User Type and sign out; customer accounts also show VendorApplication. Otherwise it renders the selected login/register form.
+State includes registering, busy, error, loading signals and name/email/password form strings. The constructor calls restore; a failure is shown as an error, and loading always clears. When authenticated, the page displays name/email/User Type and sign out; vendor self-registration is deferred. Otherwise it renders the selected login/register form.
 
 submit() sets busy and clears errors, selects register or login from registering(), clears the password on success, displays failures, and clears busy in finally. logout() similarly manages pending/error state around the service. switchMode() clears error/password and resets password visibility. hidePassword controls the suffix show/hide action.
 
@@ -55,8 +55,6 @@ The header exposes a persistent light/dark toggle on every route. The account ro
 
 The header cart indicator uses an inline SVG shopping-cart icon and a numeric quantity badge, including on mobile. Its accessible label and hover title include the item count; it remains a display indicator rather than adding a new cart action. Theme controls are icon-only with accessible action labels.
 
-## VendorApplication
+## Deferred vendor onboarding
 
-The account component imports the standalone vendor-application.component.ts. It appears only for a signed-in customer and loads GET /manage/applications in its constructor. It displays the applicant's own status/reason; pending applications suppress duplicate entry. Rejected applicants may submit again. The form asks for business name, exact official state/district, phone and address; the server takes contact email from the account. submit posts `{data}` to /manage/apply with the existing cookie/header convention, prevents duplicate clicks and reloads statuses. Errors are visible. Approval occurs in admin /vendors and promotes the owner on the server; refreshing the account reloads the new role. No automatic notification or polling is implemented.
-
-CatalogPage owns products/loading/error signals and a load method; it fetches public /catalog, replaces products on success and offers retry after errors. The form and catalog do not introduce customer order placement, payment or cart persistence.
+VendorApplication remains an unmounted legacy component. AccountPage no longer imports or renders it; POST /manage/apply rejects new applications. The shop registers customers only. Vendor and Agent registration will be added later. Existing catalog, account identity and customer auth behavior are unchanged.

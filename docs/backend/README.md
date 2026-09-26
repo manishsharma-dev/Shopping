@@ -19,3 +19,5 @@ The backend uses NestJS modules and TypeORM with PostgreSQL. Start with [runtime
 There is no DTO or service for features that only return static controller data. This is explicitly stated in their guides rather than inventing a layer that does not exist.
 
 - [Scoped management](features/management.md): User Types, regional/vendor scope, applications, products, fields, orders and audit.
+
+- [User Types and hierarchy](features/user-types.md): default protection, lower-only delegation, agents, geography and vendor approval.

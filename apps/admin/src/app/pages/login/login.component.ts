@@ -36,6 +36,7 @@ export class LoginPage {
           'vendor_admin',
           'vendor',
           'staff',
+          'agent',
         ].includes(this.auth.user()!.role)
       ) {
         await this.auth.logout();

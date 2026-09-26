@@ -17,6 +17,13 @@ import { ManagementService } from './management.service';
 @UseGuards(AuthGuard)
 export class ManagementController {
   constructor(private readonly service: ManagementService) {}
+  @Get('access') access(@Req() req: AuthRequest) {
+    return this.service.capabilities(req.user);
+  }
+  @Get('geography') async geography(@Req() req: AuthRequest) {
+    await this.service.capabilities(req.user);
+    return this.service.geography();
+  }
   @Get('applications') applications(@Req() req: AuthRequest) {
     return this.service.applications(req.user);
   }

@@ -22,3 +22,5 @@ Generated references describe code on disk, not a running deployment. Database t
 Authentication and scoped vendor/product/admin workflows are implemented. Customer checkout and payments remain placeholders. See [management](backend/features/management.md) and the feature status for precise boundaries.
 
 [Operations and documentation-tooling file references](generated/README.md) cover Compose, root scripts, the importer, CI, and repository instructions.
+
+[User Types and hierarchy](backend/features/user-types.md) describes the current administration and mandatory vendor approval workflow. Public vendor/Agent registration is deferred.

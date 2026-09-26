@@ -24,7 +24,13 @@ const snapshot = {
 };
 describe('Management workspace', () => {
   beforeEach(async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => snapshot }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ ...snapshot, states: [], districts: [] }),
+      }),
+    );
     await TestBed.configureTestingModule({
       imports: [ManagementPage],
       providers: [
@@ -98,5 +104,85 @@ describe('Management workspace', () => {
     expect(page.can('orders_accept')).toBe(true);
     expect(page.can('orders_manage')).toBe(false);
     expect(page.can('team')).toBe(false);
+  });
+  it('uses server-provided lower types and requires regional selection', async () => {
+    const fixture = TestBed.createComponent(ManagementPage);
+    await fixture.whenStable();
+    const page = fixture.componentInstance;
+    const type = {
+      id: 'district-type',
+      name: 'District Admin',
+      kind: 'type',
+      status: 'active',
+      state: '',
+      district: '',
+      vendorId: '',
+      version: 1,
+      createdAt: '',
+      data: { role: 'district_admin', rank: 40, permissions: ['vendors'] },
+    };
+    page.snapshot.set({
+      ...page.snapshot()!,
+      assignableTypes: [type],
+      permissions: ['team'],
+      typeLevels: [{ role: 'agent', permissions: ['vendors'] }],
+      hierarchy: 50,
+    });
+    page.start('users');
+    page.draft['userTypeId'] = 'district-type';
+    expect(page.selectedRole).toBe('district_admin');
+    expect(page.availableTypes.map((t) => t.id)).toEqual(['district-type']);
+    page.geography.set({
+      states: [{ id: 1, name: 'State A' }],
+      districts: [
+        { id: 1, state: 'State A', name: 'District A' },
+        { id: 2, state: 'State B', name: 'District B' },
+      ],
+    });
+    page.draft['state'] = 'State A';
+    expect(page.districtOptions.map((d) => d.name)).toEqual(['District A']);
+    fixture.changeDetectorRef.markForCheck();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(
+      fixture.nativeElement.querySelector('mat-select[name="state"]').getAttribute('aria-required'),
+    ).toBe('true');
+    expect(
+      fixture.nativeElement
+        .querySelector('mat-select[name="district"]')
+        .getAttribute('aria-required'),
+    ).toBe('true');
+  });
+  it('allows a vendor-specific type to be selected before selecting its vendor', async () => {
+    const fixture = TestBed.createComponent(ManagementPage);
+    await fixture.whenStable();
+    const page = fixture.componentInstance;
+    const type = {
+      id: 'scoped',
+      name: 'Vendor team',
+      kind: 'type',
+      status: 'active',
+      state: 'State A',
+      district: 'District A',
+      vendorId: 'vendor',
+      version: 1,
+      createdAt: '',
+      data: { role: 'staff' },
+    };
+    page.snapshot.set({
+      ...page.snapshot()!,
+      assignableTypes: [type],
+      vendorOptions: [
+        { id: 'vendor', name: 'Vendor', status: 'active' },
+        { id: 'other', name: 'Other', status: 'active' },
+      ],
+    });
+    page.start('users');
+    page.draft['vendorId'] = '';
+    expect(page.availableTypes).toContain(type);
+    page.draft['userTypeId'] = 'scoped';
+    page.selectUserType();
+    expect(page.draft['vendorId']).toBe('vendor');
+    expect(page.vendorOptions.map((v) => v.id)).toEqual(['vendor']);
   });
 });
